@@ -87,7 +87,7 @@ services:
     volumes:
       - production_django_media:/app/media
     ports:
-      - 127.0.0.1:9229:80
+      - 9229:80
     networks:
       - backend
     restart: always

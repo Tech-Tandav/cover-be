@@ -34,6 +34,13 @@ class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
     logo = models.ImageField(upload_to="brands/", blank=True, null=True)
+    categories = models.ManyToManyField(
+        Category,
+        related_name="brands",
+        blank=True,
+        help_text="Categories this brand appears in. Used to filter the brand "
+        "dropdown in the product form once a category is selected.",
+    )
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -50,22 +57,39 @@ class Brand(models.Model):
         super().save(*args, **kwargs)
 
 
-class ProductType(models.Model):
-    name = models.CharField(max_length=60, unique=True)
-    slug = models.SlugField(max_length=80, unique=True, blank=True)
+class Variant(models.Model):
+    """A specific phone/device variant under a brand, e.g. ``iPhone 16``,
+    ``iPhone 16 Plus``, ``Galaxy S23 Ultra``. Products link to one or more
+    variants to express compatibility."""
+
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.CASCADE,
+        related_name="variants",
+    )
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=160, blank=True)
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["sort_order", "name"]
+        ordering = ["brand__name", "sort_order", "name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["brand", "name"], name="variant_unique_per_brand"
+            ),
+            models.UniqueConstraint(
+                fields=["brand", "slug"], name="variant_slug_unique_per_brand"
+            ),
+        ]
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.brand.name} {self.name}"
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.name)[:160]
         super().save(*args, **kwargs)
 
 
@@ -82,18 +106,14 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         related_name="products",
     )
-    type = models.ForeignKey(
-        ProductType,
-        on_delete=models.PROTECT,
+    variants = models.ManyToManyField(
+        Variant,
         related_name="products",
+        blank=True,
+        help_text="Device variants this product is compatible with.",
     )
     material = models.CharField(max_length=80, blank=True, default="")
     color = models.CharField(max_length=80, blank=True, default="")
-    compatible_with = models.JSONField(
-        default=list,
-        blank=True,
-        help_text="List of phone models, e.g. ['iPhone 15 Pro', 'iPhone 15']",
-    )
 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(

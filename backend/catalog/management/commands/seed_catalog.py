@@ -12,7 +12,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from backend.catalog.models import Brand, Category, Product, ProductType
+from backend.catalog.models import Brand, Category, Product, Variant
 
 CATEGORIES = [
     {
@@ -313,7 +313,7 @@ class Command(BaseCommand):
         if options["reset"]:
             self.stdout.write(self.style.WARNING("Deleting existing catalog data…"))
             Product.objects.all().delete()
-            ProductType.objects.all().delete()
+            Variant.objects.all().delete()
             Brand.objects.all().delete()
             Category.objects.all().delete()
 
@@ -335,39 +335,52 @@ class Command(BaseCommand):
                 self.style.SUCCESS(("+ " if created else "~ ") + cat.name)
             )
 
-        # Product types — derived from the seed data so the lookup table is
-        # populated alongside the products that reference it.
-        type_by_name = {}
-        seed_type_names = sorted({p.get("type", "Other") for p in PRODUCTS} | {"Other"})
-        for idx, name in enumerate(seed_type_names):
-            obj, _ = ProductType.objects.get_or_create(
-                name=name,
-                defaults={"sort_order": idx},
-            )
-            type_by_name[name] = obj
-
-        # Brands — same pattern as types.
+        # Brands — derived from seed data and linked to every category that
+        # references them. The form will then surface the right brands once
+        # the owner picks a category.
         brand_by_name = {}
-        seed_brand_names = sorted({p["brand"] for p in PRODUCTS} | {"Unbranded"})
-        for idx, name in enumerate(seed_brand_names):
+        brand_categories: dict[str, set[str]] = {}
+        for p in PRODUCTS:
+            brand_categories.setdefault(p["brand"], set()).add(p["category"])
+        brand_categories.setdefault("Unbranded", set())
+
+        for idx, name in enumerate(sorted(brand_categories.keys())):
             obj, _ = Brand.objects.get_or_create(
                 name=name,
                 defaults={"sort_order": idx},
             )
+            cat_objs = [
+                cat_by_slug[slug] for slug in brand_categories[name] if slug in cat_by_slug
+            ]
+            obj.categories.set(cat_objs)
             brand_by_name[name] = obj
+
+        # Variants — derived from the legacy compatible_with strings on each
+        # seed product. Each unique (brand, compat_string) becomes one Variant
+        # row scoped to that brand. The product is then linked via M2M after
+        # update_or_create.
+        variant_by_brand_name: dict[tuple[str, str], Variant] = {}
+        for p in PRODUCTS:
+            for compat in p.get("compatible_with", []) or []:
+                key = (p["brand"], compat)
+                if key in variant_by_brand_name:
+                    continue
+                variant, _ = Variant.objects.get_or_create(
+                    brand=brand_by_name[p["brand"]],
+                    name=compat,
+                )
+                variant_by_brand_name[key] = variant
 
         # Products
         for p in PRODUCTS:
             cat = cat_by_slug[p["category"]]
-            Product.objects.update_or_create(
+            product, _ = Product.objects.update_or_create(
                 name=p["name"],
                 brand=brand_by_name[p["brand"]],
                 defaults={
                     "category": cat,
-                    "type": type_by_name[p.get("type", "Other")],
                     "material": p.get("material", ""),
                     "color": p.get("color", ""),
-                    "compatible_with": p.get("compatible_with", []),
                     "price": Decimal(p["price"]),
                     "discount_price": (
                         Decimal(p["discount_price"]) if p.get("discount_price") else None
@@ -380,6 +393,12 @@ class Command(BaseCommand):
                     "description": p.get("description", ""),
                 },
             )
+            variants = [
+                variant_by_brand_name[(p["brand"], c)]
+                for c in (p.get("compatible_with", []) or [])
+                if (p["brand"], c) in variant_by_brand_name
+            ]
+            product.variants.set(variants)
             self.stdout.write(self.style.SUCCESS(f"+ {p['brand']} — {p['name']}"))
 
         self.stdout.write(self.style.SUCCESS("\nSeeding complete."))

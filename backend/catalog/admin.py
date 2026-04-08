@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Brand, Category, Product, ProductImage, ProductType
+from .models import Brand, Category, Product, ProductImage, Variant
 
 
 class ProductImageInline(admin.TabularInline):
@@ -14,14 +14,17 @@ class BrandAdmin(admin.ModelAdmin):
     list_editable = ("is_active", "sort_order")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name", "slug")
+    filter_horizontal = ("categories",)
 
 
-@admin.register(ProductType)
-class ProductTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "is_active", "sort_order")
+@admin.register(Variant)
+class VariantAdmin(admin.ModelAdmin):
+    list_display = ("name", "brand", "slug", "is_active", "sort_order")
     list_editable = ("is_active", "sort_order")
-    prepopulated_fields = {"slug": ("name",)}
-    search_fields = ("name", "slug")
+    list_filter = ("brand", "is_active")
+    list_select_related = ("brand",)
+    search_fields = ("name", "slug", "brand__name")
+    autocomplete_fields = ("brand",)
 
 
 @admin.register(Category)
@@ -45,10 +48,11 @@ class ProductAdmin(admin.ModelAdmin):
         "is_featured",
         "is_new",
     )
-    list_filter = ("category", "brand", "type", "is_active", "is_featured", "is_new")
-    list_select_related = ("category", "brand", "type")
+    list_filter = ("category", "brand", "is_active", "is_featured", "is_new")
+    list_select_related = ("category", "brand")
     list_editable = ("price", "discount_price", "stock", "is_active", "is_featured", "is_new")
     prepopulated_fields = {"slug": ("name",)}
-    search_fields = ("name", "brand", "slug", "description")
+    search_fields = ("name", "brand__name", "slug", "description")
     inlines = [ProductImageInline]
-    autocomplete_fields = ("category", "brand", "type")
+    autocomplete_fields = ("category", "brand")
+    filter_horizontal = ("variants",)

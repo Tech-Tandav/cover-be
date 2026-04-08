@@ -2,15 +2,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser
 
-from backend.catalog.models import Brand, Category, Product, ProductType
+from backend.catalog.models import Brand, Category, Product, Variant
 
 from .serializers import (
     BrandSerializer,
     CategorySerializer,
     ProductDetailSerializer,
     ProductListSerializer,
-    ProductTypeSerializer,
     ProductWriteSerializer,
+    VariantSerializer,
 )
 
 
@@ -26,9 +26,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class BrandViewSet(viewsets.ModelViewSet):
-    queryset = Brand.objects.all()
+    queryset = Brand.objects.all().prefetch_related("categories")
     serializer_class = BrandSerializer
     lookup_field = "slug"
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        "categories__slug": ["exact"],
+        "is_active": ["exact"],
+    }
+    search_fields = ["name"]
 
     def get_permissions(self):
         if self.action in ("list", "retrieve"):
@@ -41,13 +48,20 @@ class BrandViewSet(viewsets.ModelViewSet):
             self.request.user and self.request.user.is_staff
         ):
             qs = qs.filter(is_active=True)
-        return qs
+        return qs.distinct()
 
 
-class ProductTypeViewSet(viewsets.ModelViewSet):
-    queryset = ProductType.objects.all()
-    serializer_class = ProductTypeSerializer
-    lookup_field = "slug"
+class VariantViewSet(viewsets.ModelViewSet):
+    queryset = Variant.objects.select_related("brand").all()
+    serializer_class = VariantSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        "brand__slug": ["exact"],
+        "brand": ["exact"],
+        "is_active": ["exact"],
+    }
+    search_fields = ["name"]
 
     def get_permissions(self):
         if self.action in ("list", "retrieve"):
@@ -64,7 +78,10 @@ class ProductTypeViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.select_related("category", "brand", "type").prefetch_related("images")
+    queryset = (
+        Product.objects.select_related("category", "brand")
+        .prefetch_related("images", "variants")
+    )
     lookup_field = "slug"
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -72,15 +89,15 @@ class ProductViewSet(viewsets.ModelViewSet):
         "category__slug": ["exact"],
         "brand__name": ["exact"],
         "brand__slug": ["exact"],
-        "type__name": ["exact"],
-        "type__slug": ["exact"],
+        "variants__slug": ["exact"],
+        "variants__name": ["exact"],
         "material": ["exact"],
         "is_featured": ["exact"],
         "is_new": ["exact"],
         "is_active": ["exact"],
         "price": ["gte", "lte"],
     }
-    search_fields = ["name", "brand", "description"]
+    search_fields = ["name", "brand__name", "description"]
     ordering_fields = ["created_at", "price", "rating"]
     ordering = ["-created_at"]
 
@@ -103,4 +120,4 @@ class ProductViewSet(viewsets.ModelViewSet):
             self.request.user and self.request.user.is_staff
         ):
             qs = qs.filter(is_active=True)
-        return qs
+        return qs.distinct()

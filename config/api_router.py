@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from backend.catalog.api.views import (
     BrandViewSet,
     CategoryViewSet,
+    PhoneModelViewSet,
     ProductViewSet,
     VariantViewSet,
 )
@@ -22,6 +23,7 @@ router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 router.register("users", UserViewSet)
 router.register("catalog/categories", CategoryViewSet, basename="category")
 router.register("catalog/brands", BrandViewSet, basename="brand")
+router.register("catalog/phone-models", PhoneModelViewSet, basename="phone-model")
 router.register("catalog/variants", VariantViewSet, basename="variant")
 router.register("catalog/products", ProductViewSet, basename="product")
 router.register("orders/orders", OrderViewSet, basename="order")

@@ -12,7 +12,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from backend.catalog.models import Brand, Category, Product, Variant
+from backend.catalog.models import Brand, Category, PhoneModel, Product, Variant
 
 CATEGORIES = [
     {
@@ -314,6 +314,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("Deleting existing catalog data…"))
             Product.objects.all().delete()
             Variant.objects.all().delete()
+            PhoneModel.objects.all().delete()
             Brand.objects.all().delete()
             Category.objects.all().delete()
 
@@ -355,19 +356,31 @@ class Command(BaseCommand):
             obj.categories.set(cat_objs)
             brand_by_name[name] = obj
 
-        # Variants — derived from the legacy compatible_with strings on each
-        # seed product. Each unique (brand, compat_string) becomes one Variant
-        # row scoped to that brand. The product is then linked via M2M after
-        # update_or_create.
+        # Phone models + variants — derived from the legacy compatible_with
+        # strings on each seed product. Each brand gets a single ``Default``
+        # PhoneModel; every unique (brand, compat_string) under that brand
+        # becomes one Variant scoped to that default model. Owners can split
+        # the default model into proper ones from /admin/.
+        default_model_by_brand: dict[str, PhoneModel] = {}
         variant_by_brand_name: dict[tuple[str, str], Variant] = {}
         for p in PRODUCTS:
-            for compat in p.get("compatible_with", []) or []:
-                key = (p["brand"], compat)
+            compat = p.get("compatible_with", []) or []
+            if not compat:
+                continue
+            brand_name = p["brand"]
+            if brand_name not in default_model_by_brand:
+                default_model_by_brand[brand_name], _ = PhoneModel.objects.get_or_create(
+                    brand=brand_by_name[brand_name],
+                    name="Default",
+                )
+            default_model = default_model_by_brand[brand_name]
+            for compat_name in compat:
+                key = (brand_name, compat_name)
                 if key in variant_by_brand_name:
                     continue
                 variant, _ = Variant.objects.get_or_create(
-                    brand=brand_by_name[p["brand"]],
-                    name=compat,
+                    model=default_model,
+                    name=compat_name,
                 )
                 variant_by_brand_name[key] = variant
 

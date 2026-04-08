@@ -57,15 +57,14 @@ class Brand(models.Model):
         super().save(*args, **kwargs)
 
 
-class Variant(models.Model):
-    """A specific phone/device variant under a brand, e.g. ``iPhone 16``,
-    ``iPhone 16 Plus``, ``Galaxy S23 Ultra``. Products link to one or more
-    variants to express compatibility."""
+class PhoneModel(models.Model):
+    """A device model line under a brand, e.g. ``iPhone 16``, ``Galaxy S23``.
+    Variants belong to a model, and a model belongs to a brand."""
 
     brand = models.ForeignKey(
         Brand,
         on_delete=models.CASCADE,
-        related_name="variants",
+        related_name="phone_models",
     )
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=160, blank=True)
@@ -77,15 +76,51 @@ class Variant(models.Model):
         ordering = ["brand__name", "sort_order", "name"]
         constraints = [
             models.UniqueConstraint(
-                fields=["brand", "name"], name="variant_unique_per_brand"
+                fields=["brand", "name"], name="phonemodel_unique_per_brand"
             ),
             models.UniqueConstraint(
-                fields=["brand", "slug"], name="variant_slug_unique_per_brand"
+                fields=["brand", "slug"], name="phonemodel_slug_unique_per_brand"
             ),
         ]
 
     def __str__(self) -> str:
         return f"{self.brand.name} {self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)[:160]
+        super().save(*args, **kwargs)
+
+
+class Variant(models.Model):
+    """A specific device variant under a phone model, e.g. ``16 Plus`` and
+    ``16 Pro Max`` under ``iPhone 16``. Products link to one or more variants
+    to express compatibility."""
+
+    model = models.ForeignKey(
+        PhoneModel,
+        on_delete=models.CASCADE,
+        related_name="variants",
+    )
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=160, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["model__brand__name", "model__name", "sort_order", "name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["model", "name"], name="variant_unique_per_model"
+            ),
+            models.UniqueConstraint(
+                fields=["model", "slug"], name="variant_slug_unique_per_model"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.model} {self.name}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

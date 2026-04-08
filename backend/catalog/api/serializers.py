@@ -1,6 +1,13 @@
 from rest_framework import serializers
 
-from backend.catalog.models import Brand, Category, Product, ProductImage, Variant
+from backend.catalog.models import (
+    Brand,
+    Category,
+    PhoneModel,
+    Product,
+    ProductImage,
+    Variant,
+)
 
 PLACEHOLDER_IMAGE = (
     "https://images.unsplash.com/photo-1592286927505-1def25115558?w=800&q=80"
@@ -91,12 +98,12 @@ class BrandSerializer(serializers.ModelSerializer):
         return list(obj.categories.values_list("slug", flat=True))
 
 
-class VariantSerializer(serializers.ModelSerializer):
+class PhoneModelSerializer(serializers.ModelSerializer):
     brand_slug = serializers.SlugField(source="brand.slug", read_only=True)
     brand_name = serializers.CharField(source="brand.name", read_only=True)
 
     class Meta:
-        model = Variant
+        model = PhoneModel
         fields = [
             "id",
             "name",
@@ -108,6 +115,39 @@ class VariantSerializer(serializers.ModelSerializer):
             "is_active",
         ]
         read_only_fields = ["id", "slug", "brand_slug", "brand_name"]
+
+
+class VariantSerializer(serializers.ModelSerializer):
+    model_slug = serializers.SlugField(source="model.slug", read_only=True)
+    model_name = serializers.CharField(source="model.name", read_only=True)
+    brand_id = serializers.IntegerField(source="model.brand_id", read_only=True)
+    brand_slug = serializers.SlugField(source="model.brand.slug", read_only=True)
+    brand_name = serializers.CharField(source="model.brand.name", read_only=True)
+
+    class Meta:
+        model = Variant
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "model",
+            "model_slug",
+            "model_name",
+            "brand_id",
+            "brand_slug",
+            "brand_name",
+            "sort_order",
+            "is_active",
+        ]
+        read_only_fields = [
+            "id",
+            "slug",
+            "model_slug",
+            "model_name",
+            "brand_id",
+            "brand_slug",
+            "brand_name",
+        ]
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -227,14 +267,20 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "slug"]
 
     def validate(self, attrs):
-        """Ensure all chosen variants belong to the chosen brand."""
+        """Ensure all chosen variants belong to a model under the chosen brand,
+        and that all variants belong to the same model."""
         brand = attrs.get("brand") or getattr(self.instance, "brand", None)
         variants = attrs.get("variants")
         if brand and variants:
-            mismatched = [v for v in variants if v.brand_id != brand.id]
+            mismatched = [v for v in variants if v.model.brand_id != brand.id]
             if mismatched:
                 names = ", ".join(v.name for v in mismatched)
                 raise serializers.ValidationError(
                     {"variants": f"Variants do not belong to {brand.name}: {names}"}
+                )
+            model_ids = {v.model_id for v in variants}
+            if len(model_ids) > 1:
+                raise serializers.ValidationError(
+                    {"variants": "All variants must belong to the same model."}
                 )
         return attrs

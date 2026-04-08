@@ -2,11 +2,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser
 
-from backend.catalog.models import Brand, Category, Product, Variant
+from backend.catalog.models import Brand, Category, PhoneModel, Product, Variant
 
 from .serializers import (
     BrandSerializer,
     CategorySerializer,
+    PhoneModelSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
     ProductWriteSerializer,
@@ -51,14 +52,41 @@ class BrandViewSet(viewsets.ModelViewSet):
         return qs.distinct()
 
 
-class VariantViewSet(viewsets.ModelViewSet):
-    queryset = Variant.objects.select_related("brand").all()
-    serializer_class = VariantSerializer
+class PhoneModelViewSet(viewsets.ModelViewSet):
+    queryset = PhoneModel.objects.select_related("brand").all()
+    serializer_class = PhoneModelSerializer
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {
         "brand__slug": ["exact"],
         "brand": ["exact"],
+        "is_active": ["exact"],
+    }
+    search_fields = ["name"]
+
+    def get_permissions(self):
+        if self.action in ("list", "retrieve"):
+            return [AllowAny()]
+        return [IsAdminUser()]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.action in ("list", "retrieve") and not (
+            self.request.user and self.request.user.is_staff
+        ):
+            qs = qs.filter(is_active=True)
+        return qs
+
+
+class VariantViewSet(viewsets.ModelViewSet):
+    queryset = Variant.objects.select_related("model", "model__brand").all()
+    serializer_class = VariantSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        "model__slug": ["exact"],
+        "model": ["exact"],
+        "model__brand__slug": ["exact"],
         "is_active": ["exact"],
     }
     search_fields = ["name"]

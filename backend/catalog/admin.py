@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Brand, Category, Product, ProductImage, Variant
+from .models import Brand, Category, PhoneModel, Product, ProductImage, Variant
 
 
 class ProductImageInline(admin.TabularInline):
@@ -17,14 +17,24 @@ class BrandAdmin(admin.ModelAdmin):
     filter_horizontal = ("categories",)
 
 
-@admin.register(Variant)
-class VariantAdmin(admin.ModelAdmin):
+@admin.register(PhoneModel)
+class PhoneModelAdmin(admin.ModelAdmin):
     list_display = ("name", "brand", "slug", "is_active", "sort_order")
     list_editable = ("is_active", "sort_order")
     list_filter = ("brand", "is_active")
     list_select_related = ("brand",)
     search_fields = ("name", "slug", "brand__name")
     autocomplete_fields = ("brand",)
+
+
+@admin.register(Variant)
+class VariantAdmin(admin.ModelAdmin):
+    list_display = ("name", "model", "slug", "is_active", "sort_order")
+    list_editable = ("is_active", "sort_order")
+    list_filter = ("model__brand", "model", "is_active")
+    list_select_related = ("model", "model__brand")
+    search_fields = ("name", "slug", "model__name", "model__brand__name")
+    autocomplete_fields = ("model",)
 
 
 @admin.register(Category)

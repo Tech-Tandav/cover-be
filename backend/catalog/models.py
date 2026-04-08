@@ -30,23 +30,46 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
 
-class Product(models.Model):
-    TYPE_CHOICES = [
-        ("Slim", "Slim"),
-        ("Rugged", "Rugged"),
-        ("Wallet", "Wallet"),
-        ("Transparent", "Transparent"),
-        ("Tempered Glass", "Tempered Glass"),
-        ("Matte", "Matte"),
-        ("Wall Charger", "Wall Charger"),
-        ("Cable", "Cable"),
-        ("Earbuds", "Earbuds"),
-        ("Smart Watch", "Smart Watch"),
-        ("Power Bank", "Power Bank"),
-        ("Speaker", "Speaker"),
-        ("Other", "Other"),
-    ]
+class Brand(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    logo = models.ImageField(upload_to="brands/", blank=True, null=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class ProductType(models.Model):
+    name = models.CharField(max_length=60, unique=True)
+    slug = models.SlugField(max_length=80, unique=True, blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class Product(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
@@ -54,8 +77,16 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
-    brand = models.CharField(max_length=100)
-    type = models.CharField(max_length=60, choices=TYPE_CHOICES, default="Other")
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.PROTECT,
+        related_name="products",
+    )
+    type = models.ForeignKey(
+        ProductType,
+        on_delete=models.PROTECT,
+        related_name="products",
+    )
     material = models.CharField(max_length=80, blank=True, default="")
     color = models.CharField(max_length=80, blank=True, default="")
     compatible_with = models.JSONField(

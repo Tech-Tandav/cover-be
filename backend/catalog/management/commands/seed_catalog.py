@@ -12,7 +12,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from backend.catalog.models import Category, Product
+from backend.catalog.models import Brand, Category, Product, ProductType
 
 CATEGORIES = [
     {
@@ -313,6 +313,8 @@ class Command(BaseCommand):
         if options["reset"]:
             self.stdout.write(self.style.WARNING("Deleting existing catalog data…"))
             Product.objects.all().delete()
+            ProductType.objects.all().delete()
+            Brand.objects.all().delete()
             Category.objects.all().delete()
 
         # Categories
@@ -333,15 +335,36 @@ class Command(BaseCommand):
                 self.style.SUCCESS(("+ " if created else "~ ") + cat.name)
             )
 
+        # Product types — derived from the seed data so the lookup table is
+        # populated alongside the products that reference it.
+        type_by_name = {}
+        seed_type_names = sorted({p.get("type", "Other") for p in PRODUCTS} | {"Other"})
+        for idx, name in enumerate(seed_type_names):
+            obj, _ = ProductType.objects.get_or_create(
+                name=name,
+                defaults={"sort_order": idx},
+            )
+            type_by_name[name] = obj
+
+        # Brands — same pattern as types.
+        brand_by_name = {}
+        seed_brand_names = sorted({p["brand"] for p in PRODUCTS} | {"Unbranded"})
+        for idx, name in enumerate(seed_brand_names):
+            obj, _ = Brand.objects.get_or_create(
+                name=name,
+                defaults={"sort_order": idx},
+            )
+            brand_by_name[name] = obj
+
         # Products
         for p in PRODUCTS:
             cat = cat_by_slug[p["category"]]
             Product.objects.update_or_create(
                 name=p["name"],
-                brand=p["brand"],
+                brand=brand_by_name[p["brand"]],
                 defaults={
                     "category": cat,
-                    "type": p.get("type", "Other"),
+                    "type": type_by_name[p.get("type", "Other")],
                     "material": p.get("material", ""),
                     "color": p.get("color", ""),
                     "compatible_with": p.get("compatible_with", []),

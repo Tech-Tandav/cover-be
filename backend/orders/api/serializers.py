@@ -3,13 +3,12 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
-from backend.catalog.models import Product, ProductType
+from backend.catalog.models import Product
 from backend.orders.models import Order, OrderItem
 
 
 class OrderItemReadSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source="product.id", read_only=True)
-    product_type_id = serializers.IntegerField(source="product_type.id", read_only=True, allow_null=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
@@ -17,7 +16,6 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "product_id",
-            "product_type_id",
             "product_name",
             "product_image",
             "variant_color",
@@ -33,7 +31,8 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
 
 class OrderItemWriteSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
-    product_type_id = serializers.IntegerField(required=False, allow_null=True)
+    color = serializers.CharField(required=False, allow_blank=True, default="")
+    size = serializers.CharField(required=False, allow_blank=True, default="")
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -99,57 +98,33 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     {"items": f"Product {item['product_id']} not found"}
                 ) from exc
 
-            pt = None
-            pt_id = item.get("product_type_id")
-            if pt_id:
-                try:
-                    pt = ProductType.objects.get(
-                        pk=pt_id, product=product, is_active=True
-                    )
-                except ProductType.DoesNotExist as exc:
-                    raise serializers.ValidationError(
-                        {"items": f"ProductType {pt_id} not found for product {product.id}"}
-                    ) from exc
-                if pt.stock < item["quantity"]:
-                    raise serializers.ValidationError(
-                        {
-                            "items": (
-                                f"Only {pt.stock} of {product.name} "
-                                f"({pt.color}{f' / {pt.size}' if pt.size else ''}) in stock"
-                            )
-                        }
-                    )
-            elif product.types.filter(is_active=True).exists():
+            if product.stock < item["quantity"]:
                 raise serializers.ValidationError(
                     {
                         "items": (
-                                f"{product.name} requires a color/size selection"
+                            f"Only {product.stock} of {product.name} in stock"
                         )
                     }
                 )
 
             unit_price = product.discount_price or product.price
-            ft = product.featured_type
-            product_image_url = ""
-            if ft and ft.image:
-                try:
-                    product_image_url = ft.image.url
-                except ValueError:
-                    pass
+            try:
+                product_image_url = product.image.url if product.image else ""
+            except ValueError:
+                product_image_url = ""
+
             OrderItem.objects.create(
                 order=order,
                 product=product,
-                product_type=pt,
                 product_name=product.name,
                 product_image=product_image_url,
-                variant_color=pt.color if pt else "",
-                variant_size=pt.size if pt else "",
+                variant_color=item.get("color", ""),
+                variant_size=item.get("size", ""),
                 unit_price=unit_price,
                 quantity=item["quantity"],
             )
-            if pt:
-                pt.stock = max(0, pt.stock - item["quantity"])
-                pt.save(update_fields=["stock"])
+            product.stock = max(0, product.stock - item["quantity"])
+            product.save(update_fields=["stock"])
 
         order.recalc_totals()
         order.save(update_fields=["subtotal", "total"])

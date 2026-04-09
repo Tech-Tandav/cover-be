@@ -179,13 +179,25 @@ class Product(models.Model):
         help_text="Device variants this product is compatible with.",
     )
     material = models.CharField(max_length=80, blank=True, default="")
+    colors = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='List of color names, e.g. ["Matte Black", "Rose Gold"].',
+    )
+    sizes = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='Optional list of sizes, e.g. ["S", "M", "L"]. Empty when not applicable.',
+    )
 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
+    stock = models.PositiveIntegerField(default=0)
 
     description = models.TextField(blank=True, default="")
+    image = models.ImageField(upload_to="products/", blank=True, null=True)
 
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     review_count = models.PositiveIntegerField(default=0)
@@ -215,92 +227,6 @@ class Product(models.Model):
             base = slugify(f"{self.brand}-{self.name}")[:200]
             self.slug = base
         super().save(*args, **kwargs)
-
-    @property
-    def featured_type(self):
-        """Return the first active ProductType, used as the representative
-        variant wherever the Product itself is displayed (listing image, etc.)."""
-        return self.types.filter(is_active=True).first()
-
-    @property
-    def total_stock(self) -> int:
-        """Total quantity across all active ProductType rows."""
-        return sum(t.stock for t in self.types.filter(is_active=True))
-
-    @property
-    def available_colors(self) -> list[str]:
-        seen: list[str] = []
-        for t in self.types.filter(is_active=True):
-            if t.color and t.color not in seen:
-                seen.append(t.color)
-        return seen
-
-    @property
-    def available_sizes(self) -> list[str]:
-        seen: list[str] = []
-        for t in self.types.filter(is_active=True):
-            if t.size and t.size not in seen:
-                seen.append(t.size)
-        return seen
-
-
-class ProductType(models.Model):
-    """A specific (color, size) variation of a Product. Each ProductType carries
-    its own color, image, and stock. The total quantity of all active
-    ProductType rows equals the overall quantity of the parent Product."""
-
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name="types",
-    )
-    color = models.CharField(max_length=80)
-    size = models.CharField(
-        max_length=40,
-        blank=True,
-        default="",
-        help_text="Empty for products that don't have a size axis (e.g. cases "
-        "that fit only one device variant).",
-    )
-    sku_code = models.CharField(max_length=64, unique=True, blank=True)
-    stock = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to="products/types/", blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["product_id", "sort_order", "color", "size"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["product", "color", "size"],
-                name="producttype_unique_color_size_per_product",
-            ),
-        ]
-
-    def __str__(self) -> str:
-        bits = [self.color]
-        if self.size:
-            bits.append(self.size)
-        return f"{self.product.name} — {' / '.join(bits)}"
-
-    def save(self, *args, **kwargs):
-        if not self.sku_code:
-            base = slugify(
-                f"{self.product_id}-{self.color}-{self.size or 'one'}"
-            )[:60]
-            candidate = base
-            i = 1
-            while (
-                ProductType.objects.filter(sku_code=candidate)
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                i += 1
-                candidate = f"{base}-{i}"
-            self.sku_code = candidate
-        super().save(*args, **kwargs)
-
 
 class ProductImage(models.Model):
     product = models.ForeignKey(

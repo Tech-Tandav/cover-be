@@ -12,7 +12,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from backend.catalog.models import Brand, Category, PhoneModel, Product, ProductType, Variant
+from backend.catalog.models import Brand, Category, PhoneModel, Product, Variant
 
 CATEGORIES = [
     {
@@ -81,8 +81,6 @@ CATEGORIES = [
     },
 ]
 
-# Each product defines a "types" list — these become ProductType rows.
-# color & stock live on ProductType, not on Product.
 PRODUCTS = [
     # ── Mobile Covers ──────────────────────────────────────────────
     {
@@ -90,86 +88,76 @@ PRODUCTS = [
         "name": "Carbon Fiber Armor Case",
         "brand": "Spigen",
         "material": "TPU + Polycarbonate",
+        "colors": ["Matte Black", "Gunmetal"],
         "compatible_with": ["iPhone 15 Pro"],
         "price": "2499",
         "discount_price": "1899",
+        "stock": 24,
         "rating": "4.7",
         "review_count": 128,
         "hot_sale_live": True,
         "description": "Military-grade drop protection with raised bezels around the camera and screen.",
-        "types": [
-            {"color": "Matte Black", "stock": 14},
-            {"color": "Gunmetal", "stock": 10},
-        ],
     },
     {
         "category": "mobile-covers",
         "name": "Liquid Silicone Soft Case",
         "brand": "Apple Style",
         "material": "Silicone",
+        "colors": ["Midnight Blue", "Lavender", "Chalk White"],
         "compatible_with": ["Samsung Galaxy S24 Ultra"],
         "price": "1499",
         "discount_price": "1199",
+        "stock": 41,
         "rating": "4.5",
         "review_count": 86,
         "hot_sale_live": True,
         "is_new": True,
         "description": "Silky smooth silicone exterior with microfiber lining inside.",
-        "types": [
-            {"color": "Midnight Blue", "stock": 20},
-            {"color": "Lavender", "stock": 12},
-            {"color": "Chalk White", "stock": 9},
-        ],
     },
     {
         "category": "mobile-covers",
         "name": "Clear Shockproof Case",
         "brand": "ESR",
         "material": "TPU",
+        "colors": ["Crystal Clear"],
         "compatible_with": ["iPhone 14", "iPhone 14 Plus"],
         "price": "999",
+        "stock": 60,
         "rating": "4.3",
         "review_count": 54,
         "description": "Anti-yellowing crystal clear case with reinforced air-cushion corners.",
-        "types": [
-            {"color": "Crystal Clear", "stock": 60},
-        ],
     },
     {
         "category": "mobile-covers",
         "name": "MagSafe Leather Wallet Case",
         "brand": "Nillkin",
         "material": "Leather",
+        "colors": ["Saddle Brown", "Black"],
         "compatible_with": ["iPhone 15", "iPhone 15 Pro"],
         "price": "3299",
         "discount_price": "2799",
+        "stock": 18,
         "rating": "4.8",
         "review_count": 45,
         "hot_sale_live": True,
         "is_new": True,
         "description": "Genuine leather with MagSafe magnets and a slot for two cards.",
-        "types": [
-            {"color": "Saddle Brown", "stock": 10},
-            {"color": "Black", "stock": 8},
-        ],
     },
     {
         "category": "mobile-covers",
         "name": "Aramid Fiber Premium Case",
         "brand": "Pitaka",
         "material": "Aramid Fiber",
+        "colors": ["Black/Grey Twill", "Black/Gold Twill"],
         "compatible_with": ["iPhone 15 Pro Max"],
         "price": "5999",
         "discount_price": "4999",
+        "stock": 8,
         "rating": "4.9",
         "review_count": 31,
         "hot_sale_live": True,
         "is_new": True,
         "description": "Aerospace-grade aramid fiber. Lighter than air, stronger than steel.",
-        "types": [
-            {"color": "Black/Grey Twill", "stock": 5},
-            {"color": "Black/Gold Twill", "stock": 3},
-        ],
     },
     # ── Screen Protectors ──────────────────────────────────────────
     {
@@ -177,31 +165,29 @@ PRODUCTS = [
         "name": "9H Tempered Glass Protector",
         "brand": "Spigen",
         "material": "Glass",
+        "colors": ["Clear"],
         "compatible_with": ["iPhone 15"],
         "price": "599",
         "discount_price": "449",
+        "stock": 120,
         "rating": "4.6",
         "review_count": 210,
         "hot_sale_live": True,
         "description": "9H hardness with oleophobic coating. Bubble-free installation kit included.",
-        "types": [
-            {"color": "Clear", "stock": 120},
-        ],
     },
     {
         "category": "screen-protectors",
         "name": "Anti-Glare Matte Protector",
         "brand": "ESR",
         "material": "Glass",
+        "colors": ["Matte"],
         "compatible_with": ["Samsung Galaxy S24"],
         "price": "699",
+        "stock": 75,
         "rating": "4.4",
         "review_count": 67,
         "is_new": True,
         "description": "Reduces glare and fingerprints. Great for outdoor use.",
-        "types": [
-            {"color": "Matte", "stock": 75},
-        ],
     },
     # ── Chargers ───────────────────────────────────────────────────
     {
@@ -209,33 +195,29 @@ PRODUCTS = [
         "name": "65W GaN Fast Charger",
         "brand": "Anker",
         "material": "PC",
+        "colors": ["White", "Black"],
         "compatible_with": ["Universal"],
         "price": "3499",
         "discount_price": "2999",
+        "stock": 32,
         "rating": "4.8",
         "review_count": 156,
         "hot_sale_live": True,
         "description": "Tiny 65W GaN charger with 2 USB-C and 1 USB-A.",
-        "types": [
-            {"color": "White", "stock": 20},
-            {"color": "Black", "stock": 12},
-        ],
     },
     {
         "category": "chargers",
         "name": "Braided USB-C to Lightning Cable 1.5m",
         "brand": "Baseus",
         "material": "Nylon Braided",
+        "colors": ["Space Grey", "Rose Gold"],
         "compatible_with": ["iPhone"],
         "price": "899",
         "discount_price": "749",
+        "stock": 88,
         "rating": "4.5",
         "review_count": 92,
         "description": "MFi-certified, braided nylon, supports 20W fast charging.",
-        "types": [
-            {"color": "Space Grey", "stock": 50},
-            {"color": "Rose Gold", "stock": 38},
-        ],
     },
     # ── Earbuds ────────────────────────────────────────────────────
     {
@@ -243,18 +225,16 @@ PRODUCTS = [
         "name": "ANC Wireless Earbuds Pro",
         "brand": "Soundcore",
         "material": "ABS",
+        "colors": ["Onyx Black", "Cloud White"],
         "compatible_with": ["Universal"],
         "price": "6999",
         "discount_price": "5499",
+        "stock": 19,
         "rating": "4.7",
         "review_count": 198,
         "hot_sale_live": True,
         "is_new": True,
         "description": "Active noise cancellation, 36-hour playback, IPX5 water resistance.",
-        "types": [
-            {"color": "Onyx Black", "stock": 10},
-            {"color": "Cloud White", "stock": 9},
-        ],
     },
     # ── Smart Watch ────────────────────────────────────────────────
     {
@@ -262,17 +242,15 @@ PRODUCTS = [
         "name": "Smart Fitness Watch X3",
         "brand": "Noise",
         "material": "Aluminium",
+        "colors": ["Jet Black", "Silver Frost"],
         "compatible_with": ["Android", "iOS"],
         "price": "4999",
         "discount_price": "3999",
+        "stock": 14,
         "rating": "4.4",
         "review_count": 73,
         "hot_sale_live": True,
         "description": '1.96" AMOLED, 100+ sport modes, SpO2, Bluetooth calling.',
-        "types": [
-            {"color": "Jet Black", "stock": 8},
-            {"color": "Silver Frost", "stock": 6},
-        ],
     },
     # ── Power Bank ─────────────────────────────────────────────────
     {
@@ -280,16 +258,14 @@ PRODUCTS = [
         "name": "20000mAh Fast Charging Power Bank",
         "brand": "Mi",
         "material": "Aluminium",
+        "colors": ["Silver", "Black"],
         "compatible_with": ["Universal"],
         "price": "2999",
         "discount_price": "2499",
+        "stock": 27,
         "rating": "4.6",
         "review_count": 142,
         "description": "20000mAh, 22.5W fast charging, dual USB-C in/out.",
-        "types": [
-            {"color": "Silver", "stock": 18},
-            {"color": "Black", "stock": 9},
-        ],
     },
     # ── Speaker ────────────────────────────────────────────────────
     {
@@ -297,16 +273,14 @@ PRODUCTS = [
         "name": "Bluetooth Party Speaker 30W",
         "brand": "JBL",
         "material": "Fabric + ABS",
+        "colors": ["Black", "Teal"],
         "compatible_with": ["Universal"],
         "price": "5499",
+        "stock": 9,
         "rating": "4.5",
         "review_count": 38,
         "is_new": True,
         "description": "30W output, IPX7 waterproof, 12hr playback, party-pair mode.",
-        "types": [
-            {"color": "Black", "stock": 5},
-            {"color": "Teal", "stock": 4},
-        ],
     },
 ]
 
@@ -325,7 +299,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options["reset"]:
             self.stdout.write(self.style.WARNING("Deleting existing catalog data…"))
-            ProductType.objects.all().delete()
             Product.objects.all().delete()
             Variant.objects.all().delete()
             PhoneModel.objects.all().delete()
@@ -394,7 +367,7 @@ class Command(BaseCommand):
                 )
                 variant_by_brand_name[key] = variant
 
-        # ── Products + ProductTypes ────────────────────────────────
+        # ── Products ───────────────────────────────────────────────
         for p in PRODUCTS:
             cat = cat_by_slug[p["category"]]
             product, created = Product.objects.update_or_create(
@@ -403,10 +376,13 @@ class Command(BaseCommand):
                 defaults={
                     "category": cat,
                     "material": p.get("material", ""),
+                    "colors": p.get("colors", []),
+                    "sizes": p.get("sizes", []),
                     "price": Decimal(p["price"]),
                     "discount_price": (
                         Decimal(p["discount_price"]) if p.get("discount_price") else None
                     ),
+                    "stock": p.get("stock", 0),
                     "rating": Decimal(p.get("rating", "0")),
                     "review_count": p.get("review_count", 0),
                     "hot_sale_live": p.get("hot_sale_live", False),
@@ -415,7 +391,6 @@ class Command(BaseCommand):
                 },
             )
 
-            # Set compatible variants
             variants = [
                 variant_by_brand_name[(p["brand"], c)]
                 for c in (p.get("compatible_with", []) or [])
@@ -423,25 +398,11 @@ class Command(BaseCommand):
             ]
             product.variants.set(variants)
 
-            # Create ProductType rows (color + stock)
-            for idx, t in enumerate(p.get("types", [])):
-                ProductType.objects.update_or_create(
-                    product=product,
-                    color=t["color"],
-                    size=t.get("size", ""),
-                    defaults={
-                        "stock": t.get("stock", 0),
-                        "is_active": True,
-                        "sort_order": idx,
-                    },
-                )
-
-            type_summary = ", ".join(
-                f'{t["color"]}({t["stock"]})' for t in p.get("types", [])
-            )
+            colors_str = ", ".join(p.get("colors", []))
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"{'+ ' if created else '~ '}{p['brand']} — {p['name']}  [{type_summary}]"
+                    f"{'+ ' if created else '~ '}{p['brand']} — {p['name']}  "
+                    f"[{colors_str}] stock={p.get('stock', 0)}"
                 )
             )
 

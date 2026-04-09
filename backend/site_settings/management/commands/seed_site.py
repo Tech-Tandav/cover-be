@@ -55,11 +55,15 @@ class Command(BaseCommand):
         instance.hours = "Sun – Fri · 10:00 AM – 8:00 PM"
         instance.hours_note = "Closed Saturdays"
         instance.map_embed_url = (
-            "https://www.openstreetmap.org/export/embed.html?"
-            "bbox=83.96%2C28.20%2C84.00%2C28.23&layer=mapnik&marker=28.215%2C83.985"
+            "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d219.72340270370597"
+            "!2d83.99130678134509!3d28.220239174692836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768"
+            "!4f13.1!3m3!1m2!1s0x3995950058de8c0f%3A0xb48c2d7dc8a54d55"
+            "!2sAarambha%20sports%20house%20Pokhara!5e0!3m2!1sen!2snp"
+            "!4v1775750558991!5m2!1sen!2snp"
         )
         instance.map_directions_url = (
-            "https://www.google.com/maps/search/?api=1&query=Naya+Bazaar+Pokhara+Nepal"
+            "https://www.google.com/maps/place/Aarambha+sports+house+Pokhara/"
+            "@28.2202392,83.9913068,19z"
         )
         instance.social_links = SOCIAL_LINKS
 

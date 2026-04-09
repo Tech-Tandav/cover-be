@@ -1,10 +1,10 @@
 volumes:
-  estorepostgres_data: {}
-  estorepostgres_data_backups: {}
-  estoredjango_media: {}
-  estoredjango_staticfiles: {}
+  nice_postgres_data: {}
+  nice_postgres_data_backups: {}
+  nice_django_media: {}
+  nice_django_staticfiles: {}
   
-  estoreredis_data: {}
+  nice_redis_data: {}
   
 networks:
   backend:
@@ -15,9 +15,9 @@ services:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
 
-    image: backend_estoredjango
+    image: backend_nice_django
     volumes:
-      - estoredjango_media:/app/backend/media
+      - nice_django_media:/app/backend/media
     depends_on:
       - postgres
       - redis
@@ -33,10 +33,10 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: backend_estorepostgres
+    image: backend_nice_postgres
     volumes:
-      - estorepostgres_data:/var/lib/postgresql/data
-      - estorepostgres_data_backups:/backups
+      - nice_postgres_data:/var/lib/postgresql/data
+      - nice_postgres_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
     networks:
@@ -47,7 +47,7 @@ services:
     image: docker.io/redis:6
     
     volumes:
-      - estoreredis_data:/data
+      - nice_redis_data:/data
     
     networks:
       - backend
@@ -55,7 +55,7 @@ services:
 
   celeryworker:
     <<: *django
-    image: backend_estoreceleryworker
+    image: backend_nice_celeryworker
     command: /start-celeryworker
     networks:
       - backend
@@ -63,7 +63,7 @@ services:
 
   celerybeat:
     <<: *django
-    image: backend_estorecelerybeat
+    image: backend_nice_celerybeat
     command: /start-celerybeat
     networks:
       - backend
@@ -71,7 +71,7 @@ services:
 
   flower:
     <<: *django
-    image: backend_estoreflower
+    image: backend_nice_flower
     command: /start-flower
     networks:
       - backend
@@ -81,11 +81,11 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/nginx/Dockerfile
-    image: backend_estorenginx
+    image: backend_nice_nginx
     depends_on:
       - django
     volumes:
-      - estoredjango_media:/app/media
+      - nice_django_media:/app/media
     ports:
       - 9229:80
     networks:

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 
-from backend.catalog.models import Product, ProductType
+from backend.catalog.models import Product
 
 
 class Order(models.Model):
@@ -87,13 +87,6 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="+")
-    product_type = models.ForeignKey(
-        ProductType,
-        on_delete=models.PROTECT,
-        related_name="+",
-        null=True,
-        blank=True,
-    )
 
     # Snapshot fields — keep order history accurate even if product changes.
     product_name = models.CharField(max_length=200)

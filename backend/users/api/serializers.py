@@ -57,7 +57,7 @@ class LoyaltyMovementSerializer(serializers.Serializer):
     points = serializers.IntegerField(min_value=1)
     reason = serializers.CharField(max_length=200, required=False, allow_blank=True)
     order = serializers.PrimaryKeyRelatedField(
-        queryset=None,  # set in __init__ to avoid circular import at module load
+        queryset=(),  # real queryset assigned in __init__ to avoid circular import
         required=False,
         allow_null=True,
     )

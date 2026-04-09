@@ -179,7 +179,13 @@ class Product(models.Model):
         help_text="Device variants this product is compatible with.",
     )
     material = models.CharField(max_length=80, blank=True, default="")
-    color = models.CharField(max_length=80, blank=True, default="")
+    color = models.CharField(
+        max_length=80,
+        blank=True,
+        default="",
+        help_text="Legacy single-color field. New products should define one or "
+        "more ProductSku rows instead.",
+    )
 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(
@@ -214,6 +220,93 @@ class Product(models.Model):
         if not self.slug:
             base = slugify(f"{self.brand}-{self.name}")[:200]
             self.slug = base
+        super().save(*args, **kwargs)
+
+    @property
+    def has_skus(self) -> bool:
+        return self.skus.filter(is_active=True).exists()
+
+    @property
+    def total_stock(self) -> int:
+        """Sum of stock across active SKUs, falling back to ``Product.stock``
+        for legacy products that have no SKUs defined yet."""
+        if self.has_skus:
+            return sum(s.stock for s in self.skus.filter(is_active=True))
+        return self.stock
+
+    @property
+    def available_colors(self) -> list[str]:
+        seen: list[str] = []
+        for sku in self.skus.filter(is_active=True):
+            if sku.color and sku.color not in seen:
+                seen.append(sku.color)
+        return seen
+
+    @property
+    def available_sizes(self) -> list[str]:
+        seen: list[str] = []
+        for sku in self.skus.filter(is_active=True):
+            if sku.size and sku.size not in seen:
+                seen.append(sku.size)
+        return seen
+
+
+class ProductSku(models.Model):
+    """A specific (color, size) variation of a Product. Same coordinates in
+    (category, brand, model, variant) — the only thing that differs is the
+    physical color and size of the cover. Price always lives on the Product."""
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="skus",
+    )
+    color = models.CharField(max_length=80)
+    size = models.CharField(
+        max_length=40,
+        blank=True,
+        default="",
+        help_text="Empty for products that don't have a size axis (e.g. cases "
+        "that fit only one device variant).",
+    )
+    sku_code = models.CharField(max_length=64, unique=True, blank=True)
+    stock = models.PositiveIntegerField(default=0)
+    image = models.ImageField(upload_to="products/skus/", blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["product_id", "sort_order", "color", "size"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "color", "size"],
+                name="productsku_unique_color_size_per_product",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        bits = [self.color]
+        if self.size:
+            bits.append(self.size)
+        return f"{self.product.name} — {' / '.join(bits)}"
+
+    def save(self, *args, **kwargs):
+        if not self.sku_code:
+            base = slugify(
+                f"{self.product_id}-{self.color}-{self.size or 'one'}"
+            )[:60]
+            # Disambiguate against an existing row with the same generated code.
+            candidate = base
+            i = 1
+            while (
+                ProductSku.objects.filter(sku_code=candidate)
+                .exclude(pk=self.pk)
+                .exists()
+            ):
+                i += 1
+                candidate = f"{base}-{i}"
+            self.sku_code = candidate
         super().save(*args, **kwargs)
 
 

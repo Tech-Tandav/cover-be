@@ -1,11 +1,17 @@
 from django.contrib import admin
 
-from .models import Brand, Category, PhoneModel, Product, ProductImage, Variant
+from .models import Brand, Category, PhoneModel, Product, ProductImage, ProductSku, Variant
 
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
+
+
+class ProductSkuInline(admin.TabularInline):
+    model = ProductSku
+    extra = 1
+    fields = ("color", "size", "stock", "is_active", "sort_order", "image")
 
 
 @admin.register(Brand)
@@ -63,6 +69,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ("price", "discount_price", "stock", "is_active", "is_featured", "is_new")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name", "brand__name", "slug", "description")
-    inlines = [ProductImageInline]
+    inlines = [ProductSkuInline, ProductImageInline]
     autocomplete_fields = ("category", "brand")
     filter_horizontal = ("variants",)

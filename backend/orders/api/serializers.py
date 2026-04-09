@@ -3,12 +3,13 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
-from backend.catalog.models import Product
+from backend.catalog.models import Product, ProductSku
 from backend.orders.models import Order, OrderItem
 
 
 class OrderItemReadSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source="product.id", read_only=True)
+    sku_id = serializers.IntegerField(source="sku.id", read_only=True, allow_null=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,8 +17,11 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "product_id",
+            "sku_id",
             "product_name",
             "product_image",
+            "variant_color",
+            "variant_size",
             "unit_price",
             "quantity",
             "subtotal",
@@ -29,6 +33,7 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
 
 class OrderItemWriteSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
+    sku_id = serializers.IntegerField(required=False, allow_null=True)
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -94,6 +99,36 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     {"items": f"Product {item['product_id']} not found"}
                 ) from exc
 
+            sku = None
+            sku_id = item.get("sku_id")
+            if sku_id:
+                try:
+                    sku = ProductSku.objects.get(
+                        pk=sku_id, product=product, is_active=True
+                    )
+                except ProductSku.DoesNotExist as exc:
+                    raise serializers.ValidationError(
+                        {"items": f"SKU {sku_id} not found for product {product.id}"}
+                    ) from exc
+                if sku.stock < item["quantity"]:
+                    raise serializers.ValidationError(
+                        {
+                            "items": (
+                                f"Only {sku.stock} of {product.name} "
+                                f"({sku.color}{f' / {sku.size}' if sku.size else ''}) in stock"
+                            )
+                        }
+                    )
+            elif product.skus.filter(is_active=True).exists():
+                # The product has SKUs configured — the client must pick one.
+                raise serializers.ValidationError(
+                    {
+                        "items": (
+                                f"{product.name} requires a color/size selection"
+                        )
+                    }
+                )
+
             unit_price = product.discount_price or product.price
             try:
                 product_image_url = product.image.url if product.image else ""
@@ -102,14 +137,21 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             OrderItem.objects.create(
                 order=order,
                 product=product,
+                sku=sku,
                 product_name=product.name,
                 product_image=product_image_url,
+                variant_color=sku.color if sku else "",
+                variant_size=sku.size if sku else "",
                 unit_price=unit_price,
                 quantity=item["quantity"],
             )
-            # Decrement stock.
-            product.stock = max(0, product.stock - item["quantity"])
-            product.save(update_fields=["stock"])
+            # Decrement stock — on the SKU when picked, otherwise on the product.
+            if sku:
+                sku.stock = max(0, sku.stock - item["quantity"])
+                sku.save(update_fields=["stock"])
+            else:
+                product.stock = max(0, product.stock - item["quantity"])
+                product.save(update_fields=["stock"])
 
         order.recalc_totals()
         order.save(update_fields=["subtotal", "total"])

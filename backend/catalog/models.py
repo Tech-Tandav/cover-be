@@ -128,6 +128,30 @@ class Variant(models.Model):
         super().save(*args, **kwargs)
 
 
+class Store(models.Model):
+    name = models.CharField(max_length=120, unique=True)
+    slug = models.SlugField(max_length=140, unique=True, blank=True)
+    location = models.CharField(max_length=200, blank=True, default="")
+    address = models.TextField(blank=True, default="")
+    phone = models.CharField(max_length=40, blank=True, default="")
+    email = models.EmailField(blank=True, default="")
+    logo = models.ImageField(upload_to="stores/", blank=True, null=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class Product(models.Model):
     category = models.ForeignKey(
         Category,
@@ -140,6 +164,13 @@ class Product(models.Model):
         Brand,
         on_delete=models.PROTECT,
         related_name="products",
+    )
+    store = models.ForeignKey(
+        Store,
+        on_delete=models.PROTECT,
+        related_name="products",
+        null=True,
+        blank=True,
     )
     variants = models.ManyToManyField(
         Variant,

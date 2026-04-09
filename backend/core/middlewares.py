@@ -2,22 +2,28 @@ from channels.middleware import BaseMiddleware
 
 
 class TokenAuthMiddleware(BaseMiddleware):
+    """Channels middleware that authenticates a websocket connection from
+    a JWT passed as `?token=<access>` in the query string."""
+
     async def __call__(self, scope, receive, send):
-        from backend.calculate.sockets.utils import get_user_from_token
+        from django.contrib.auth import get_user_model
         from django.contrib.auth.models import AnonymousUser
-        from rest_framework.authtoken.models import Token
-        # Expect token in query string: ?token=abcd1234
+        from rest_framework_simplejwt.exceptions import TokenError
+        from rest_framework_simplejwt.tokens import UntypedToken
+
         query_string = scope["query_string"].decode()
         token_key = None
         if "token=" in query_string:
-            token_key = query_string.split("token=")[-1]
+            token_key = query_string.split("token=")[-1].split("&")[0]
+
+        scope["user"] = AnonymousUser()
         if token_key:
             try:
-                token = await Token.objects.aget(key=token_key)
-                scope["user"] = await get_user_from_token(token)
-            except Exception:
+                validated = UntypedToken(token_key)
+                user_id = validated["user_id"]
+                User = get_user_model()
+                scope["user"] = await User.objects.aget(pk=user_id)
+            except (TokenError, KeyError, Exception):
                 scope["user"] = AnonymousUser()
-        else:
-            scope["user"] = AnonymousUser()
-   
+
         return await super().__call__(scope, receive, send)

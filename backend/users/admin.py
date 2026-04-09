@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User
+from .models import LoyaltyAccount, LoyaltyTransaction, User
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -38,3 +38,32 @@ class UserAdmin(auth_admin.UserAdmin):
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+
+
+class LoyaltyTransactionInline(admin.TabularInline):
+    model = LoyaltyTransaction
+    extra = 0
+    can_delete = False
+    readonly_fields = ["kind", "points", "balance_after", "reason", "order", "created_at"]
+    ordering = ["-created_at"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LoyaltyAccount)
+class LoyaltyAccountAdmin(admin.ModelAdmin):
+    list_display = ["user", "tier", "points", "lifetime_points", "updated_at"]
+    list_filter = ["tier"]
+    search_fields = ["user__username", "user__email", "user__name"]
+    readonly_fields = ["lifetime_points", "tier", "joined_at", "updated_at"]
+    inlines = [LoyaltyTransactionInline]
+
+
+@admin.register(LoyaltyTransaction)
+class LoyaltyTransactionAdmin(admin.ModelAdmin):
+    list_display = ["account", "kind", "points", "balance_after", "created_at"]
+    list_filter = ["kind", "created_at"]
+    search_fields = ["account__user__username", "reason"]
+    readonly_fields = ["account", "kind", "points", "balance_after", "reason", "order", "created_at"]
+    date_hierarchy = "created_at"

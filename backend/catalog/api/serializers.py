@@ -8,7 +8,7 @@ from backend.catalog.models import (
     PhoneModel,
     Product,
     ProductImage,
-    ProductSku,
+    ProductType,
     Variant,
 )
 
@@ -62,12 +62,12 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return _absolute_image_url(self.context.get("request"), obj.image)
 
 
-class ProductSkuSerializer(serializers.ModelSerializer):
+class ProductTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     in_stock = serializers.SerializerMethodField()
 
     class Meta:
-        model = ProductSku
+        model = ProductType
         fields = [
             "id",
             "color",
@@ -81,12 +81,12 @@ class ProductSkuSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "sku_code", "in_stock"]
 
-    def get_image(self, obj: ProductSku) -> str | None:
+    def get_image(self, obj: ProductType) -> str | None:
         if not obj.image:
             return None
         return _absolute_image_url(self.context.get("request"), obj.image)
 
-    def get_in_stock(self, obj: ProductSku) -> bool:
+    def get_in_stock(self, obj: ProductType) -> bool:
         return obj.is_active and obj.stock > 0
 
 
@@ -188,7 +188,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     brand_slug = serializers.SlugField(source="brand.slug", read_only=True)
     variants = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
-    skus = ProductSkuSerializer(many=True, read_only=True)
+    color = serializers.SerializerMethodField()
+    types = ProductTypeSerializer(many=True, read_only=True)
     total_stock = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -206,19 +207,25 @@ class ProductListSerializer(serializers.ModelSerializer):
             "color",
             "price",
             "discount_price",
-            "stock",
             "total_stock",
-            "skus",
+            "types",
             "image",
             "rating",
             "review_count",
-            "is_featured",
+            "hot_sale_live",
             "is_new",
             "created_at",
         ]
 
     def get_image(self, obj: Product) -> str:
-        return _absolute_image_url(self.context.get("request"), obj.image)
+        ft = obj.featured_type
+        if ft and ft.image:
+            return _absolute_image_url(self.context.get("request"), ft.image)
+        return PLACEHOLDER_IMAGE
+
+    def get_color(self, obj: Product) -> str:
+        ft = obj.featured_type
+        return ft.color if ft else ""
 
     def get_variants(self, obj: Product) -> list[str]:
         return [v.name for v in obj.variants.all()]
@@ -232,7 +239,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     variants = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True, read_only=True)
     image = serializers.SerializerMethodField()
-    skus = ProductSkuSerializer(many=True, read_only=True)
+    color = serializers.SerializerMethodField()
+    types = ProductTypeSerializer(many=True, read_only=True)
     total_stock = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -250,28 +258,34 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "color",
             "price",
             "discount_price",
-            "stock",
             "total_stock",
-            "skus",
+            "types",
             "description",
             "image",
             "images",
             "rating",
             "review_count",
-            "is_featured",
+            "hot_sale_live",
             "is_new",
             "created_at",
         ]
 
     def get_image(self, obj: Product) -> str:
-        return _absolute_image_url(self.context.get("request"), obj.image)
+        ft = obj.featured_type
+        if ft and ft.image:
+            return _absolute_image_url(self.context.get("request"), ft.image)
+        return PLACEHOLDER_IMAGE
+
+    def get_color(self, obj: Product) -> str:
+        ft = obj.featured_type
+        return ft.color if ft else ""
 
     def get_variants(self, obj: Product) -> list[str]:
         return [v.name for v in obj.variants.all()]
 
 
-class ProductSkuWriteSerializer(serializers.Serializer):
-    """SKU rows are written nested under a Product. Only color/size/stock —
+class ProductTypeWriteSerializer(serializers.Serializer):
+    """ProductType rows are written nested under a Product. Only color/size/stock —
     price always lives on the parent Product."""
 
     color = serializers.CharField(max_length=80)
@@ -292,7 +306,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         queryset=Variant.objects.filter(is_active=True),
         required=False,
     )
-    skus = ProductSkuWriteSerializer(many=True, required=False)
+    types = ProductTypeWriteSerializer(many=True, required=False)
 
     class Meta:
         model = Product
@@ -304,25 +318,22 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             "brand",
             "variants",
             "material",
-            "color",
             "price",
             "discount_price",
-            "stock",
-            "skus",
+            "types",
             "description",
-            "image",
-            "is_featured",
+            "hot_sale_live",
             "is_new",
             "is_active",
         ]
         read_only_fields = ["id", "slug"]
 
     def to_internal_value(self, data):
-        """``skus`` may arrive as a JSON string when posted via multipart
+        """``types`` may arrive as a JSON string when posted via multipart
         FormData (which is how the dashboard product form submits images).
         Decode it before normal field processing."""
         if hasattr(data, "getlist"):
-            raw = data.get("skus")
+            raw = data.get("types")
             if isinstance(raw, str) and raw:
                 import json
 
@@ -330,13 +341,13 @@ class ProductWriteSerializer(serializers.ModelSerializer):
                     parsed = json.loads(raw)
                 except json.JSONDecodeError as exc:
                     raise serializers.ValidationError(
-                        {"skus": "Invalid JSON for skus field."}
+                        {"types": "Invalid JSON for types field."}
                     ) from exc
                 # QueryDict is immutable; mutate a copy.
                 data = data.copy()
-                data.setlist("skus", [])
+                data.setlist("types", [])
                 attrs = super().to_internal_value(data)
-                attrs["skus"] = ProductSkuWriteSerializer(
+                attrs["types"] = ProductTypeWriteSerializer(
                     data=parsed, many=True
                 ).run_validation(parsed)
                 return attrs
@@ -361,47 +372,45 @@ class ProductWriteSerializer(serializers.ModelSerializer):
                     {"variants": "All variants must belong to the same model."}
                 )
 
-        skus = attrs.get("skus")
-        if skus:
+        types = attrs.get("types")
+        if types:
             seen: set[tuple[str, str]] = set()
-            for row in skus:
+            for row in types:
                 key = (row["color"].strip().lower(), (row.get("size") or "").strip().lower())
                 if key in seen:
                     raise serializers.ValidationError(
-                        {"skus": f"Duplicate (color, size) row: {row['color']} / {row.get('size') or '—'}"}
+                        {"types": f"Duplicate (color, size) row: {row['color']} / {row.get('size') or '—'}"}
                     )
                 seen.add(key)
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
-        skus = validated_data.pop("skus", None)
+        types = validated_data.pop("types", None)
         product = super().create(validated_data)
-        if skus:
-            for row in skus:
-                ProductSku.objects.create(product=product, **row)
+        if types:
+            for row in types:
+                ProductType.objects.create(product=product, **row)
         return product
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        skus = validated_data.pop("skus", None)
+        types = validated_data.pop("types", None)
         product = super().update(instance, validated_data)
-        if skus is not None:
-            # Replace the full SKU set on update — simplest semantics for the
-            # dashboard form, which always sends the canonical list.
-            existing = {(s.color, s.size): s for s in product.skus.all()}
+        if types is not None:
+            existing = {(t.color, t.size): t for t in product.types.all()}
             seen_keys: set[tuple[str, str]] = set()
-            for row in skus:
+            for row in types:
                 key = (row["color"], row.get("size", ""))
                 seen_keys.add(key)
                 if key in existing:
-                    sku = existing[key]
-                    sku.stock = row["stock"]
-                    sku.is_active = row.get("is_active", True)
-                    sku.save(update_fields=["stock", "is_active"])
+                    pt = existing[key]
+                    pt.stock = row["stock"]
+                    pt.is_active = row.get("is_active", True)
+                    pt.save(update_fields=["stock", "is_active"])
                 else:
-                    ProductSku.objects.create(product=product, **row)
-            for key, sku in existing.items():
+                    ProductType.objects.create(product=product, **row)
+            for key, pt in existing.items():
                 if key not in seen_keys:
-                    sku.delete()
+                    pt.delete()
         return product

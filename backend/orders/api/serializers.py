@@ -3,13 +3,13 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
-from backend.catalog.models import Product, ProductSku
+from backend.catalog.models import Product, ProductType
 from backend.orders.models import Order, OrderItem
 
 
 class OrderItemReadSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField(source="product.id", read_only=True)
-    sku_id = serializers.IntegerField(source="sku.id", read_only=True, allow_null=True)
+    product_type_id = serializers.IntegerField(source="product_type.id", read_only=True, allow_null=True)
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
@@ -17,7 +17,7 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "product_id",
-            "sku_id",
+            "product_type_id",
             "product_name",
             "product_image",
             "variant_color",
@@ -33,7 +33,7 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
 
 class OrderItemWriteSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
-    sku_id = serializers.IntegerField(required=False, allow_null=True)
+    product_type_id = serializers.IntegerField(required=False, allow_null=True)
     quantity = serializers.IntegerField(min_value=1)
 
 
@@ -99,28 +99,27 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     {"items": f"Product {item['product_id']} not found"}
                 ) from exc
 
-            sku = None
-            sku_id = item.get("sku_id")
-            if sku_id:
+            pt = None
+            pt_id = item.get("product_type_id")
+            if pt_id:
                 try:
-                    sku = ProductSku.objects.get(
-                        pk=sku_id, product=product, is_active=True
+                    pt = ProductType.objects.get(
+                        pk=pt_id, product=product, is_active=True
                     )
-                except ProductSku.DoesNotExist as exc:
+                except ProductType.DoesNotExist as exc:
                     raise serializers.ValidationError(
-                        {"items": f"SKU {sku_id} not found for product {product.id}"}
+                        {"items": f"ProductType {pt_id} not found for product {product.id}"}
                     ) from exc
-                if sku.stock < item["quantity"]:
+                if pt.stock < item["quantity"]:
                     raise serializers.ValidationError(
                         {
                             "items": (
-                                f"Only {sku.stock} of {product.name} "
-                                f"({sku.color}{f' / {sku.size}' if sku.size else ''}) in stock"
+                                f"Only {pt.stock} of {product.name} "
+                                f"({pt.color}{f' / {pt.size}' if pt.size else ''}) in stock"
                             )
                         }
                     )
-            elif product.skus.filter(is_active=True).exists():
-                # The product has SKUs configured — the client must pick one.
+            elif product.types.filter(is_active=True).exists():
                 raise serializers.ValidationError(
                     {
                         "items": (
@@ -130,28 +129,27 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 )
 
             unit_price = product.discount_price or product.price
-            try:
-                product_image_url = product.image.url if product.image else ""
-            except ValueError:
-                product_image_url = ""
+            ft = product.featured_type
+            product_image_url = ""
+            if ft and ft.image:
+                try:
+                    product_image_url = ft.image.url
+                except ValueError:
+                    pass
             OrderItem.objects.create(
                 order=order,
                 product=product,
-                sku=sku,
+                product_type=pt,
                 product_name=product.name,
                 product_image=product_image_url,
-                variant_color=sku.color if sku else "",
-                variant_size=sku.size if sku else "",
+                variant_color=pt.color if pt else "",
+                variant_size=pt.size if pt else "",
                 unit_price=unit_price,
                 quantity=item["quantity"],
             )
-            # Decrement stock — on the SKU when picked, otherwise on the product.
-            if sku:
-                sku.stock = max(0, sku.stock - item["quantity"])
-                sku.save(update_fields=["stock"])
-            else:
-                product.stock = max(0, product.stock - item["quantity"])
-                product.save(update_fields=["stock"])
+            if pt:
+                pt.stock = max(0, pt.stock - item["quantity"])
+                pt.save(update_fields=["stock"])
 
         order.recalc_totals()
         order.save(update_fields=["subtotal", "total"])

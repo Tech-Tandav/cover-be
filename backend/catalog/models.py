@@ -179,27 +179,21 @@ class Product(models.Model):
         help_text="Device variants this product is compatible with.",
     )
     material = models.CharField(max_length=80, blank=True, default="")
-    color = models.CharField(
-        max_length=80,
-        blank=True,
-        default="",
-        help_text="Legacy single-color field. New products should define one or "
-        "more ProductSku rows instead.",
-    )
 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
-    stock = models.PositiveIntegerField(default=0)
 
     description = models.TextField(blank=True, default="")
-    image = models.ImageField(upload_to="products/", blank=True, null=True)
 
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     review_count = models.PositiveIntegerField(default=0)
 
-    is_featured = models.BooleanField(default=False)
+    hot_sale_live = models.BooleanField(
+        default=False,
+        help_text="Show this product in the Hot Sale section on the landing page.",
+    )
     is_new = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
@@ -210,7 +204,7 @@ class Product(models.Model):
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["category", "is_active"]),
-            models.Index(fields=["is_featured"]),
+            models.Index(fields=["hot_sale_live"]),
         ]
 
     def __str__(self) -> str:
@@ -223,43 +217,42 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def has_skus(self) -> bool:
-        return self.skus.filter(is_active=True).exists()
+    def featured_type(self):
+        """Return the first active ProductType, used as the representative
+        variant wherever the Product itself is displayed (listing image, etc.)."""
+        return self.types.filter(is_active=True).first()
 
     @property
     def total_stock(self) -> int:
-        """Sum of stock across active SKUs, falling back to ``Product.stock``
-        for legacy products that have no SKUs defined yet."""
-        if self.has_skus:
-            return sum(s.stock for s in self.skus.filter(is_active=True))
-        return self.stock
+        """Total quantity across all active ProductType rows."""
+        return sum(t.stock for t in self.types.filter(is_active=True))
 
     @property
     def available_colors(self) -> list[str]:
         seen: list[str] = []
-        for sku in self.skus.filter(is_active=True):
-            if sku.color and sku.color not in seen:
-                seen.append(sku.color)
+        for t in self.types.filter(is_active=True):
+            if t.color and t.color not in seen:
+                seen.append(t.color)
         return seen
 
     @property
     def available_sizes(self) -> list[str]:
         seen: list[str] = []
-        for sku in self.skus.filter(is_active=True):
-            if sku.size and sku.size not in seen:
-                seen.append(sku.size)
+        for t in self.types.filter(is_active=True):
+            if t.size and t.size not in seen:
+                seen.append(t.size)
         return seen
 
 
-class ProductSku(models.Model):
-    """A specific (color, size) variation of a Product. Same coordinates in
-    (category, brand, model, variant) — the only thing that differs is the
-    physical color and size of the cover. Price always lives on the Product."""
+class ProductType(models.Model):
+    """A specific (color, size) variation of a Product. Each ProductType carries
+    its own color, image, and stock. The total quantity of all active
+    ProductType rows equals the overall quantity of the parent Product."""
 
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name="skus",
+        related_name="types",
     )
     color = models.CharField(max_length=80)
     size = models.CharField(
@@ -271,7 +264,7 @@ class ProductSku(models.Model):
     )
     sku_code = models.CharField(max_length=64, unique=True, blank=True)
     stock = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to="products/skus/", blank=True, null=True)
+    image = models.ImageField(upload_to="products/types/", blank=True, null=True)
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -281,7 +274,7 @@ class ProductSku(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["product", "color", "size"],
-                name="productsku_unique_color_size_per_product",
+                name="producttype_unique_color_size_per_product",
             ),
         ]
 
@@ -296,11 +289,10 @@ class ProductSku(models.Model):
             base = slugify(
                 f"{self.product_id}-{self.color}-{self.size or 'one'}"
             )[:60]
-            # Disambiguate against an existing row with the same generated code.
             candidate = base
             i = 1
             while (
-                ProductSku.objects.filter(sku_code=candidate)
+                ProductType.objects.filter(sku_code=candidate)
                 .exclude(pk=self.pk)
                 .exists()
             ):

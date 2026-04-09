@@ -120,7 +120,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         "variants__slug": ["exact"],
         "variants__name": ["exact"],
         "material": ["exact"],
-        "is_featured": ["exact"],
+        "hot_sale_live": ["exact"],
         "is_new": ["exact"],
         "is_active": ["exact"],
         "price": ["gte", "lte"],

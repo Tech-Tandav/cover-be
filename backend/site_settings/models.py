@@ -40,10 +40,12 @@ class SiteSettings(models.Model):
     hours = models.CharField(max_length=120, default="Sun – Fri · 10:00 AM – 8:00 PM")
     hours_note = models.CharField(max_length=120, default="Closed Saturdays")
     map_embed_url = models.URLField(
+        max_length=500,
         blank=True,
         default="https://www.openstreetmap.org/export/embed.html?bbox=83.96%2C28.20%2C84.00%2C28.23&layer=mapnik&marker=28.215%2C83.985",
     )
     map_directions_url = models.URLField(
+        max_length=500,
         blank=True,
         default="https://www.google.com/maps/search/?api=1&query=Naya+Bazaar+Pokhara+Nepal",
     )

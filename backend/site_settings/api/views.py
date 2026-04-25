@@ -1,4 +1,4 @@
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,12 +8,9 @@ from .serializers import SiteSettingsSerializer
 
 
 class SiteSettingsView(APIView):
-    """GET (public) and PATCH/PUT (admin) the singleton site settings."""
+    """GET/PATCH/PUT the singleton site settings."""
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        return [IsAdminUser()]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         instance = SiteSettings.load()

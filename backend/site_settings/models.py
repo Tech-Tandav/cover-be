@@ -31,6 +31,11 @@ class SiteSettings(models.Model):
     # Trust strip — list of {icon, title, subtitle}
     trust_badges = models.JSONField(default=list, blank=True)
 
+    # Repair pricing widget on hero
+    repair_model = models.CharField(max_length=120, blank=True, default="iPhone 15 Pro")
+    # list of {part, price}
+    repair_prices = models.JSONField(default=list, blank=True)
+
     # Store info
     address_line1 = models.CharField(max_length=200, default="Naya Bazaar, Pokhara-8")
     address_line2 = models.CharField(max_length=200, default="Kaski, Gandaki, Nepal")

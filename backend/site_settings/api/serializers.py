@@ -21,6 +21,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "hero_secondary_cta_href",
             "hero_stats",
             "trust_badges",
+            "repair_model",
+            "repair_prices",
             "address_line1",
             "address_line2",
             "phone",

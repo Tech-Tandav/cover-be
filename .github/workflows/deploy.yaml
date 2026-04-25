@@ -20,6 +20,7 @@ jobs :
           username : ubuntu
           key : ${{ secrets.SSH_KEY }} 
           port: 4096
+          command_timeout: 30m
           script: |
             cd /home/ubuntu/projects/cover/cover-be
             git pull

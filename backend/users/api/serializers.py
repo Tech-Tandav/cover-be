@@ -1,3 +1,4 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from backend.users.models import LoyaltyAccount, LoyaltyTransaction, User
@@ -11,6 +12,31 @@ class UserSerializer(serializers.ModelSerializer[User]):
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"},
         }
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer[User]):
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+        style={"input_type": "password"},
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "name", "password"]
+        extra_kwargs = {
+            "email": {"required": True, "allow_blank": False},
+            "name": {"required": False, "allow_blank": True},
+        }
+
+    def create(self, validated_data):
+        return User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+            name=validated_data.get("name", ""),
+        )
 
 
 class LoyaltyTransactionSerializer(serializers.ModelSerializer):

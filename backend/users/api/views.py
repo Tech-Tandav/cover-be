@@ -20,6 +20,7 @@ from .serializers import (
     LoyaltyAccountSerializer,
     LoyaltyMovementSerializer,
     LoyaltyTransactionSerializer,
+    UserRegistrationSerializer,
     UserSerializer,
 )
 
@@ -28,6 +29,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = "username"
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         assert isinstance(self.request.user.id, int)
@@ -121,7 +123,7 @@ class LoyaltyAccountViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
 
 
 class UserRegisterationView(CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
         
         

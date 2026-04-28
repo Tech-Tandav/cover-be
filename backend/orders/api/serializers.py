@@ -92,7 +92,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         for item in items_data:
             try:
-                product = Product.objects.get(pk=item["product_id"], is_active=True)
+                product = (
+                    Product.objects.select_for_update()
+                    .get(pk=item["product_id"], is_active=True)
+                )
             except Product.DoesNotExist as exc:
                 raise serializers.ValidationError(
                     {"items": f"Product {item['product_id']} not found"}
@@ -107,6 +110,18 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                     }
                 )
 
+            color = item.get("color", "")
+            size = item.get("size", "")
+
+            if color and color not in product.colors:
+                raise serializers.ValidationError(
+                    {"items": f"{product.name} is no longer available in {color}"}
+                )
+            if size and size not in product.sizes:
+                raise serializers.ValidationError(
+                    {"items": f"{product.name} is no longer available in size {size}"}
+                )
+
             unit_price = product.discount_price or product.price
             try:
                 product_image_url = product.image.url if product.image else ""
@@ -118,13 +133,21 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 product=product,
                 product_name=product.name,
                 product_image=product_image_url,
-                variant_color=item.get("color", ""),
-                variant_size=item.get("size", ""),
+                variant_color=color,
+                variant_size=size,
                 unit_price=unit_price,
                 quantity=item["quantity"],
             )
+
+            update_fields = ["stock"]
             product.stock = max(0, product.stock - item["quantity"])
-            product.save(update_fields=["stock"])
+            if color:
+                product.colors = [c for c in product.colors if c != color]
+                update_fields.append("colors")
+            if size:
+                product.sizes = [s for s in product.sizes if s != size]
+                update_fields.append("sizes")
+            product.save(update_fields=update_fields)
 
         order.recalc_totals()
         order.save(update_fields=["subtotal", "total"])

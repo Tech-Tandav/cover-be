@@ -1,0 +1,18 @@
+# General
+# ------------------------------------------------------------------------------
+USE_DOCKER=yes
+IPYTHONDIR=/app/.ipython
+
+# Seed reference data (phones + covers) on container start.
+# Set to True/1/yes to enable; leave unset or false to skip.
+DJANGO_SEED_ON_START=False
+# Redis
+# ------------------------------------------------------------------------------
+REDIS_URL=redis://redis:6379/0
+
+# Celery
+# ------------------------------------------------------------------------------
+
+# Flower
+CELERY_FLOWER_USER=nWxjJSqducVzbdguIQtOXgMYBJpTtVAQ
+CELERY_FLOWER_PASSWORD=bVhLkyuGjKFejwum34HProPLQNQ3DSlYuhBUXSZPtZbTx1r02qO85J7C4vHYZk4f

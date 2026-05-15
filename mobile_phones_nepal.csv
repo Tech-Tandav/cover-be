@@ -1,0 +1,568 @@
+brand,series,model,variant
+Samsung,Galaxy S Series,S10,S10
+Samsung,Galaxy S Series,S10,S10+
+Samsung,Galaxy S Series,S10,S10e
+Samsung,Galaxy S Series,S20,S20
+Samsung,Galaxy S Series,S20,S20+
+Samsung,Galaxy S Series,S20,S20 Ultra
+Samsung,Galaxy S Series,S20,S20 FE
+Samsung,Galaxy S Series,S21,S21
+Samsung,Galaxy S Series,S21,S21+
+Samsung,Galaxy S Series,S21,S21 Ultra
+Samsung,Galaxy S Series,S21,S21 FE
+Samsung,Galaxy S Series,S22,S22
+Samsung,Galaxy S Series,S22,S22+
+Samsung,Galaxy S Series,S22,S22 Ultra
+Samsung,Galaxy S Series,S23,S23
+Samsung,Galaxy S Series,S23,S23+
+Samsung,Galaxy S Series,S23,S23 Ultra
+Samsung,Galaxy S Series,S23,S23 FE
+Samsung,Galaxy S Series,S24,S24
+Samsung,Galaxy S Series,S24,S24+
+Samsung,Galaxy S Series,S24,S24 Ultra
+Samsung,Galaxy S Series,S24,S24 FE
+Samsung,Galaxy S Series,S25,S25
+Samsung,Galaxy S Series,S25,S25+
+Samsung,Galaxy S Series,S25,S25 Ultra
+Samsung,Galaxy S Series,S25,S25 Edge
+Samsung,Galaxy Note Series,Note 10,Note 10
+Samsung,Galaxy Note Series,Note 10,Note 10+
+Samsung,Galaxy Note Series,Note 20,Note 20
+Samsung,Galaxy Note Series,Note 20,Note 20 Ultra
+Samsung,Galaxy Z Fold Series,Z Fold 2,Z Fold 2
+Samsung,Galaxy Z Fold Series,Z Fold 3,Z Fold 3
+Samsung,Galaxy Z Fold Series,Z Fold 4,Z Fold 4
+Samsung,Galaxy Z Fold Series,Z Fold 5,Z Fold 5
+Samsung,Galaxy Z Fold Series,Z Fold 6,Z Fold 6
+Samsung,Galaxy Z Fold Series,Z Fold 7,Z Fold 7
+Samsung,Galaxy Z Flip Series,Z Flip,Z Flip
+Samsung,Galaxy Z Flip Series,Z Flip 3,Z Flip 3
+Samsung,Galaxy Z Flip Series,Z Flip 4,Z Flip 4
+Samsung,Galaxy Z Flip Series,Z Flip 5,Z Flip 5
+Samsung,Galaxy Z Flip Series,Z Flip 6,Z Flip 6
+Samsung,Galaxy Z Flip Series,Z Flip 7,Z Flip 7
+Samsung,Galaxy A Series,A05,A05
+Samsung,Galaxy A Series,A05,A05s
+Samsung,Galaxy A Series,A06,A06
+Samsung,Galaxy A Series,A14,A14
+Samsung,Galaxy A Series,A15,A15
+Samsung,Galaxy A Series,A16,A16
+Samsung,Galaxy A Series,A24,A24
+Samsung,Galaxy A Series,A25,A25
+Samsung,Galaxy A Series,A26,A26
+Samsung,Galaxy A Series,A34,A34
+Samsung,Galaxy A Series,A35,A35
+Samsung,Galaxy A Series,A36,A36
+Samsung,Galaxy A Series,A54,A54
+Samsung,Galaxy A Series,A55,A55
+Samsung,Galaxy A Series,A56,A56
+Samsung,Galaxy A Series,A73,A73
+Samsung,Galaxy M Series,M14,M14
+Samsung,Galaxy M Series,M15,M15
+Samsung,Galaxy M Series,M34,M34
+Samsung,Galaxy M Series,M35,M35
+Samsung,Galaxy M Series,M55,M55
+Samsung,Galaxy F Series,F14,F14
+Samsung,Galaxy F Series,F15,F15
+Samsung,Galaxy F Series,F34,F34
+Samsung,Galaxy F Series,F54,F54
+Apple,iPhone,iPhone 11,11
+Apple,iPhone,iPhone 11,11 Pro
+Apple,iPhone,iPhone 11,11 Pro Max
+Apple,iPhone,iPhone 12,12 mini
+Apple,iPhone,iPhone 12,12
+Apple,iPhone,iPhone 12,12 Pro
+Apple,iPhone,iPhone 12,12 Pro Max
+Apple,iPhone,iPhone 13,13 mini
+Apple,iPhone,iPhone 13,13
+Apple,iPhone,iPhone 13,13 Pro
+Apple,iPhone,iPhone 13,13 Pro Max
+Apple,iPhone,iPhone 14,14
+Apple,iPhone,iPhone 14,14 Plus
+Apple,iPhone,iPhone 14,14 Pro
+Apple,iPhone,iPhone 14,14 Pro Max
+Apple,iPhone,iPhone 15,15
+Apple,iPhone,iPhone 15,15 Plus
+Apple,iPhone,iPhone 15,15 Pro
+Apple,iPhone,iPhone 15,15 Pro Max
+Apple,iPhone,iPhone 16,16
+Apple,iPhone,iPhone 16,16 Plus
+Apple,iPhone,iPhone 16,16 Pro
+Apple,iPhone,iPhone 16,16 Pro Max
+Apple,iPhone,iPhone 16,16e
+Apple,iPhone,iPhone SE,SE 2020
+Apple,iPhone,iPhone SE,SE 2022
+Apple,iPhone,iPhone Air,Air
+Xiaomi,Xiaomi Number Series,Mi 11,Mi 11
+Xiaomi,Xiaomi Number Series,Mi 11,Mi 11 Ultra
+Xiaomi,Xiaomi Number Series,Mi 11,Mi 11 Lite
+Xiaomi,Xiaomi Number Series,Xiaomi 12,12
+Xiaomi,Xiaomi Number Series,Xiaomi 12,12 Pro
+Xiaomi,Xiaomi Number Series,Xiaomi 12,12S Ultra
+Xiaomi,Xiaomi Number Series,Xiaomi 13,13
+Xiaomi,Xiaomi Number Series,Xiaomi 13,13 Pro
+Xiaomi,Xiaomi Number Series,Xiaomi 13,13 Ultra
+Xiaomi,Xiaomi Number Series,Xiaomi 14,14
+Xiaomi,Xiaomi Number Series,Xiaomi 14,14 Pro
+Xiaomi,Xiaomi Number Series,Xiaomi 14,14 Ultra
+Xiaomi,Xiaomi Number Series,Xiaomi 15,15
+Xiaomi,Xiaomi Number Series,Xiaomi 15,15 Pro
+Xiaomi,Xiaomi Number Series,Xiaomi 15,15 Ultra
+Xiaomi,Xiaomi T Series,11T,11T
+Xiaomi,Xiaomi T Series,11T,11T Pro
+Xiaomi,Xiaomi T Series,12T,12T
+Xiaomi,Xiaomi T Series,12T,12T Pro
+Xiaomi,Xiaomi T Series,13T,13T
+Xiaomi,Xiaomi T Series,13T,13T Pro
+Xiaomi,Xiaomi T Series,14T,14T
+Xiaomi,Xiaomi T Series,14T,14T Pro
+Xiaomi,Mi Mix Series,Mix 4,Mix 4
+Xiaomi,Mi Mix Series,Mix Fold,Mix Fold
+Xiaomi,Mi Mix Series,Mix Flip,Mix Flip
+Xiaomi,Civi Series,Civi 1,Civi 1
+Xiaomi,Civi Series,Civi 2,Civi 2
+Xiaomi,Civi Series,Civi 3,Civi 3
+Xiaomi,Civi Series,Civi 4,Civi 4 Pro
+Redmi,Redmi Note Series,Note 10,Note 10
+Redmi,Redmi Note Series,Note 10,Note 10 Pro
+Redmi,Redmi Note Series,Note 10,Note 10S
+Redmi,Redmi Note Series,Note 11,Note 11
+Redmi,Redmi Note Series,Note 11,Note 11 Pro
+Redmi,Redmi Note Series,Note 11,Note 11S
+Redmi,Redmi Note Series,Note 12,Note 12
+Redmi,Redmi Note Series,Note 12,Note 12 Pro
+Redmi,Redmi Note Series,Note 12,Note 12 Pro+
+Redmi,Redmi Note Series,Note 13,Note 13
+Redmi,Redmi Note Series,Note 13,Note 13 Pro
+Redmi,Redmi Note Series,Note 13,Note 13 Pro+
+Redmi,Redmi Note Series,Note 14,Note 14
+Redmi,Redmi Note Series,Note 14,Note 14 Pro
+Redmi,Redmi Note Series,Note 14,Note 14 Pro+
+Redmi,Redmi Note Series,Note 15,Note 15
+Redmi,Redmi Number Series,Redmi 10,Redmi 10
+Redmi,Redmi Number Series,Redmi 10,Redmi 10C
+Redmi,Redmi Number Series,Redmi 11,Redmi 11
+Redmi,Redmi Number Series,Redmi 12,Redmi 12
+Redmi,Redmi Number Series,Redmi 12,Redmi 12C
+Redmi,Redmi Number Series,Redmi 13,Redmi 13
+Redmi,Redmi Number Series,Redmi 13,Redmi 13C
+Redmi,Redmi Number Series,Redmi 14,Redmi 14
+Redmi,Redmi Number Series,Redmi 14,Redmi 14C
+Redmi,Redmi Number Series,Redmi 15,Redmi 15
+Redmi,Redmi Number Series,Redmi 15,Redmi 15C
+Redmi,Redmi A Series,A1,A1
+Redmi,Redmi A Series,A2,A2
+Redmi,Redmi A Series,A3,A3
+Redmi,Redmi A Series,A4,A4
+Redmi,Redmi A Series,A5,A5
+Redmi,Redmi K Series,K50,K50
+Redmi,Redmi K Series,K60,K60
+Redmi,Redmi K Series,K70,K70
+Redmi,Redmi K Series,K80,K80
+POCO,POCO X Series,X3,X3
+POCO,POCO X Series,X3,X3 Pro
+POCO,POCO X Series,X4,X4 Pro
+POCO,POCO X Series,X5,X5
+POCO,POCO X Series,X5,X5 Pro
+POCO,POCO X Series,X6,X6
+POCO,POCO X Series,X6,X6 Pro
+POCO,POCO X Series,X7,X7
+POCO,POCO X Series,X7,X7 Pro
+POCO,POCO F Series,F3,F3
+POCO,POCO F Series,F4,F4
+POCO,POCO F Series,F5,F5
+POCO,POCO F Series,F5,F5 Pro
+POCO,POCO F Series,F6,F6
+POCO,POCO F Series,F6,F6 Pro
+POCO,POCO F Series,F7,F7
+POCO,POCO F Series,F7,F7 Pro
+POCO,POCO F Series,F7,F7 Ultra
+POCO,POCO M Series,M4,M4
+POCO,POCO M Series,M5,M5
+POCO,POCO M Series,M5,M5s
+POCO,POCO M Series,M6,M6
+POCO,POCO M Series,M6,M6 Pro
+POCO,POCO M Series,M7,M7
+POCO,POCO C Series,C40,C40
+POCO,POCO C Series,C50,C50
+POCO,POCO C Series,C55,C55
+POCO,POCO C Series,C61,C61
+POCO,POCO C Series,C65,C65
+POCO,POCO C Series,C75,C75
+Oppo,Find X Series,Find X3,Find X3
+Oppo,Find X Series,Find X3,Find X3 Pro
+Oppo,Find X Series,Find X5,Find X5
+Oppo,Find X Series,Find X5,Find X5 Pro
+Oppo,Find X Series,Find X6,Find X6
+Oppo,Find X Series,Find X6,Find X6 Pro
+Oppo,Find X Series,Find X7,Find X7
+Oppo,Find X Series,Find X7,Find X7 Ultra
+Oppo,Find X Series,Find X8,Find X8
+Oppo,Find X Series,Find X8,Find X8 Pro
+Oppo,Find X Series,Find X8,Find X8 Ultra
+Oppo,Find N Series,Find N2,Find N2
+Oppo,Find N Series,Find N3,Find N3
+Oppo,Find N Series,Find N3,Find N3 Flip
+Oppo,Find N Series,Find N5,Find N5
+Oppo,Reno Series,Reno 7,Reno 7
+Oppo,Reno Series,Reno 8,Reno 8
+Oppo,Reno Series,Reno 8,Reno 8T
+Oppo,Reno Series,Reno 10,Reno 10
+Oppo,Reno Series,Reno 10,Reno 10 Pro
+Oppo,Reno Series,Reno 11,Reno 11
+Oppo,Reno Series,Reno 11,Reno 11 Pro
+Oppo,Reno Series,Reno 12,Reno 12
+Oppo,Reno Series,Reno 12,Reno 12 Pro
+Oppo,Reno Series,Reno 13,Reno 13
+Oppo,Reno Series,Reno 13,Reno 13 Pro
+Oppo,Reno Series,Reno 14,Reno 14
+Oppo,Reno Series,Reno 14,Reno 14 Pro
+Oppo,A Series,A17,A17
+Oppo,A Series,A18,A18
+Oppo,A Series,A38,A38
+Oppo,A Series,A57,A57
+Oppo,A Series,A58,A58
+Oppo,A Series,A59,A59
+Oppo,A Series,A78,A78
+Oppo,A Series,A79,A79
+Oppo,A Series,A3,A3
+Oppo,A Series,A3,A3 Pro
+Oppo,A Series,A5,A5 Pro
+Oppo,F Series,F21,F21 Pro
+Oppo,F Series,F23,F23
+Oppo,F Series,F25,F25 Pro
+Oppo,F Series,F27,F27
+Oppo,F Series,F27,F27 Pro+
+Oppo,F Series,F29,F29
+Oppo,F Series,F29,F29 Pro
+Oppo,K Series,K12,K12
+Oppo,K Series,K12,K12x
+Oppo,K Series,K13,K13
+Realme,Realme Number Series,Realme 10,Realme 10
+Realme,Realme Number Series,Realme 10,Realme 10 Pro
+Realme,Realme Number Series,Realme 11,Realme 11
+Realme,Realme Number Series,Realme 11,Realme 11 Pro
+Realme,Realme Number Series,Realme 11,Realme 11 Pro+
+Realme,Realme Number Series,Realme 12,Realme 12
+Realme,Realme Number Series,Realme 12,Realme 12 Pro
+Realme,Realme Number Series,Realme 12,Realme 12 Pro+
+Realme,Realme Number Series,Realme 13,Realme 13
+Realme,Realme Number Series,Realme 13,Realme 13 Pro
+Realme,Realme Number Series,Realme 13,Realme 13 Pro+
+Realme,Realme Number Series,Realme 14,Realme 14
+Realme,Realme Number Series,Realme 14,Realme 14 Pro
+Realme,Realme Number Series,Realme 14,Realme 14 Pro+
+Realme,GT Series,GT 2,GT 2
+Realme,GT Series,GT 2,GT 2 Pro
+Realme,GT Series,GT Neo 3,GT Neo 3
+Realme,GT Series,GT Neo 5,GT Neo 5
+Realme,GT Series,GT 6,GT 6
+Realme,GT Series,GT 7,GT 7
+Realme,GT Series,GT 7,GT 7 Pro
+Realme,Narzo Series,Narzo 50,Narzo 50
+Realme,Narzo Series,Narzo 60,Narzo 60
+Realme,Narzo Series,Narzo 70,Narzo 70
+Realme,Narzo Series,Narzo 70,Narzo 70 Pro
+Realme,Narzo Series,Narzo N55,Narzo N55
+Realme,Narzo Series,Narzo N65,Narzo N65
+Realme,Narzo Series,Narzo 80,Narzo 80
+Realme,C Series,C30,C30
+Realme,C Series,C31,C31
+Realme,C Series,C33,C33
+Realme,C Series,C35,C35
+Realme,C Series,C51,C51
+Realme,C Series,C53,C53
+Realme,C Series,C55,C55
+Realme,C Series,C61,C61
+Realme,C Series,C63,C63
+Realme,C Series,C65,C65
+Realme,C Series,C67,C67
+Realme,C Series,C75,C75
+Realme,P Series,P1,P1
+Realme,P Series,P1,P1 Pro
+Realme,P Series,P2,P2 Pro
+Realme,P Series,P3,P3
+Realme,P Series,P3,P3 Pro
+Vivo,X Series,X70,X70
+Vivo,X Series,X70,X70 Pro
+Vivo,X Series,X80,X80
+Vivo,X Series,X80,X80 Pro
+Vivo,X Series,X90,X90
+Vivo,X Series,X90,X90 Pro
+Vivo,X Series,X100,X100
+Vivo,X Series,X100,X100 Pro
+Vivo,X Series,X100,X100 Ultra
+Vivo,X Series,X200,X200
+Vivo,X Series,X200,X200 Pro
+Vivo,X Series,X200,X200 Ultra
+Vivo,X Fold Series,X Fold,X Fold
+Vivo,X Fold Series,X Fold 2,X Fold 2
+Vivo,X Fold Series,X Fold 3,X Fold 3
+Vivo,X Fold Series,X Fold 3,X Fold 3 Pro
+Vivo,V Series,V25,V25
+Vivo,V Series,V25,V25 Pro
+Vivo,V Series,V27,V27
+Vivo,V Series,V27,V27 Pro
+Vivo,V Series,V29,V29
+Vivo,V Series,V29,V29 Pro
+Vivo,V Series,V30,V30
+Vivo,V Series,V30,V30 Pro
+Vivo,V Series,V40,V40
+Vivo,V Series,V40,V40 Pro
+Vivo,V Series,V50,V50
+Vivo,Y Series,Y16,Y16
+Vivo,Y Series,Y17,Y17
+Vivo,Y Series,Y22,Y22
+Vivo,Y Series,Y27,Y27
+Vivo,Y Series,Y28,Y28
+Vivo,Y Series,Y36,Y36
+Vivo,Y Series,Y100,Y100
+Vivo,Y Series,Y200,Y200
+Vivo,Y Series,Y200,Y200e
+Vivo,Y Series,Y300,Y300
+Vivo,Y Series,Y300,Y300 Pro
+Vivo,Y Series,Y19s,Y19s
+Vivo,Y Series,Y29,Y29
+Vivo,T Series,T2,T2
+Vivo,T Series,T2,T2 Pro
+Vivo,T Series,T3,T3
+Vivo,T Series,T3,T3 Pro
+Vivo,T Series,T4,T4
+Vivo,T Series,T4,T4 Pro
+iQOO,iQOO Number Series,iQOO 9,9
+iQOO,iQOO Number Series,iQOO 9,9 Pro
+iQOO,iQOO Number Series,iQOO 10,10
+iQOO,iQOO Number Series,iQOO 10,10 Pro
+iQOO,iQOO Number Series,iQOO 11,11
+iQOO,iQOO Number Series,iQOO 11,11 Pro
+iQOO,iQOO Number Series,iQOO 12,12
+iQOO,iQOO Number Series,iQOO 12,12 Pro
+iQOO,iQOO Number Series,iQOO 13,13
+iQOO,iQOO Neo Series,Neo 7,Neo 7
+iQOO,iQOO Neo Series,Neo 8,Neo 8
+iQOO,iQOO Neo Series,Neo 9,Neo 9
+iQOO,iQOO Neo Series,Neo 9,Neo 9 Pro
+iQOO,iQOO Neo Series,Neo 10,Neo 10
+iQOO,iQOO Neo Series,Neo 10,Neo 10 Pro
+iQOO,iQOO Z Series,Z6,Z6
+iQOO,iQOO Z Series,Z7,Z7
+iQOO,iQOO Z Series,Z7,Z7 Pro
+iQOO,iQOO Z Series,Z9,Z9
+iQOO,iQOO Z Series,Z9,Z9 Pro
+iQOO,iQOO Z Series,Z9,Z9s
+iQOO,iQOO Z Series,Z10,Z10
+iQOO,iQOO Z Series,Z10,Z10x
+OnePlus,OnePlus Number Series,OnePlus 9,9
+OnePlus,OnePlus Number Series,OnePlus 9,9 Pro
+OnePlus,OnePlus Number Series,OnePlus 9,9R
+OnePlus,OnePlus Number Series,OnePlus 10,10
+OnePlus,OnePlus Number Series,OnePlus 10,10 Pro
+OnePlus,OnePlus Number Series,OnePlus 10,10R
+OnePlus,OnePlus Number Series,OnePlus 10,10T
+OnePlus,OnePlus Number Series,OnePlus 11,11
+OnePlus,OnePlus Number Series,OnePlus 11,11R
+OnePlus,OnePlus Number Series,OnePlus 12,12
+OnePlus,OnePlus Number Series,OnePlus 12,12R
+OnePlus,OnePlus Number Series,OnePlus 13,13
+OnePlus,OnePlus Number Series,OnePlus 13,13R
+OnePlus,OnePlus Number Series,OnePlus 13,13s
+OnePlus,Nord Series,Nord 2,Nord 2
+OnePlus,Nord Series,Nord 2,Nord 2T
+OnePlus,Nord Series,Nord 3,Nord 3
+OnePlus,Nord Series,Nord 4,Nord 4
+OnePlus,Nord Series,Nord 5,Nord 5
+OnePlus,Nord Series,Nord CE,Nord CE 2
+OnePlus,Nord Series,Nord CE,Nord CE 3
+OnePlus,Nord Series,Nord CE,Nord CE 4
+OnePlus,Nord Series,Nord CE,Nord CE 5
+OnePlus,Nord Series,Nord N,Nord N20
+OnePlus,Nord Series,Nord N,Nord N30
+OnePlus,Open Series,OnePlus Open,OnePlus Open
+Honor,Magic Series,Magic 5,Magic 5
+Honor,Magic Series,Magic 5,Magic 5 Pro
+Honor,Magic Series,Magic 6,Magic 6
+Honor,Magic Series,Magic 6,Magic 6 Pro
+Honor,Magic Series,Magic 7,Magic 7
+Honor,Magic Series,Magic 7,Magic 7 Pro
+Honor,Magic V Series,Magic V2,Magic V2
+Honor,Magic V Series,Magic V3,Magic V3
+Honor,Magic V Series,Magic Vs,Magic Vs
+Honor,Magic V Series,Magic Vs,Magic Vs2
+Honor,Honor Number Series,Honor 90,90
+Honor,Honor Number Series,Honor 90,90 Pro
+Honor,Honor Number Series,Honor 100,100
+Honor,Honor Number Series,Honor 100,100 Pro
+Honor,Honor Number Series,Honor 200,200
+Honor,Honor Number Series,Honor 200,200 Pro
+Honor,Honor Number Series,Honor 200,200 Lite
+Honor,Honor Number Series,Honor 400,400
+Honor,Honor Number Series,Honor 400,400 Pro
+Honor,X Series,X7,X7
+Honor,X Series,X8,X8
+Honor,X Series,X8,X8a
+Honor,X Series,X9,X9
+Honor,X Series,X9,X9a
+Honor,X Series,X9,X9b
+Honor,X Series,X9,X9c
+Huawei,P Series,P30,P30
+Huawei,P Series,P30,P30 Pro
+Huawei,P Series,P40,P40
+Huawei,P Series,P40,P40 Pro
+Huawei,P Series,P50,P50
+Huawei,P Series,P50,P50 Pro
+Huawei,P Series,P60,P60
+Huawei,P Series,P60,P60 Pro
+Huawei,Pura Series,Pura 70,Pura 70
+Huawei,Pura Series,Pura 70,Pura 70 Pro
+Huawei,Pura Series,Pura 70,Pura 70 Ultra
+Huawei,Mate Series,Mate 40,Mate 40
+Huawei,Mate Series,Mate 40,Mate 40 Pro
+Huawei,Mate Series,Mate 50,Mate 50
+Huawei,Mate Series,Mate 50,Mate 50 Pro
+Huawei,Mate Series,Mate 60,Mate 60
+Huawei,Mate Series,Mate 60,Mate 60 Pro
+Huawei,Mate Series,Mate 70,Mate 70
+Huawei,Mate Series,Mate 70,Mate 70 Pro
+Huawei,Mate X Series,Mate X3,Mate X3
+Huawei,Mate X Series,Mate X5,Mate X5
+Huawei,Mate X Series,Mate XT,Mate XT
+Huawei,Nova Series,Nova 9,Nova 9
+Huawei,Nova Series,Nova 10,Nova 10
+Huawei,Nova Series,Nova 11,Nova 11
+Huawei,Nova Series,Nova 12,Nova 12
+Huawei,Nova Series,Nova 13,Nova 13
+Google,Pixel Series,Pixel 6,6
+Google,Pixel Series,Pixel 6,6 Pro
+Google,Pixel Series,Pixel 6,6a
+Google,Pixel Series,Pixel 7,7
+Google,Pixel Series,Pixel 7,7 Pro
+Google,Pixel Series,Pixel 7,7a
+Google,Pixel Series,Pixel 8,8
+Google,Pixel Series,Pixel 8,8 Pro
+Google,Pixel Series,Pixel 8,8a
+Google,Pixel Series,Pixel 9,9
+Google,Pixel Series,Pixel 9,9 Pro
+Google,Pixel Series,Pixel 9,9 Pro XL
+Google,Pixel Series,Pixel 9,9a
+Google,Pixel Series,Pixel 10,10
+Google,Pixel Series,Pixel 10,10 Pro
+Google,Pixel Series,Pixel 10,10 Pro XL
+Google,Pixel Fold Series,Pixel Fold,Pixel Fold
+Google,Pixel Fold Series,Pixel 9 Pro Fold,Pixel 9 Pro Fold
+Motorola,Edge Series,Edge 30,Edge 30
+Motorola,Edge Series,Edge 40,Edge 40
+Motorola,Edge Series,Edge 40,Edge 40 Pro
+Motorola,Edge Series,Edge 50,Edge 50
+Motorola,Edge Series,Edge 50,Edge 50 Pro
+Motorola,Edge Series,Edge 50,Edge 50 Ultra
+Motorola,Edge Series,Edge 60,Edge 60
+Motorola,Razr Series,Razr 40,Razr 40
+Motorola,Razr Series,Razr 40,Razr 40 Ultra
+Motorola,Razr Series,Razr 50,Razr 50
+Motorola,Razr Series,Razr 50,Razr 50 Ultra
+Motorola,G Series,G14,G14
+Motorola,G Series,G24,G24
+Motorola,G Series,G34,G34
+Motorola,G Series,G54,G54
+Motorola,G Series,G64,G64
+Motorola,G Series,G84,G84
+Motorola,G Series,G85,G85
+Motorola,E Series,E13,E13
+Motorola,E Series,E14,E14
+Nothing,Phone Series,Phone 1,Phone 1
+Nothing,Phone Series,Phone 2,Phone 2
+Nothing,Phone Series,Phone 2a,Phone 2a
+Nothing,Phone Series,Phone 2a,Phone 2a Plus
+Nothing,Phone Series,Phone 3a,Phone 3a
+Nothing,Phone Series,Phone 3a,Phone 3a Pro
+CMF,CMF Phone Series,CMF Phone 1,CMF Phone 1
+CMF,CMF Phone Series,CMF Phone 2,CMF Phone 2 Pro
+Infinix,Note Series,Note 12,Note 12
+Infinix,Note Series,Note 30,Note 30
+Infinix,Note Series,Note 30,Note 30 Pro
+Infinix,Note Series,Note 40,Note 40
+Infinix,Note Series,Note 40,Note 40 Pro
+Infinix,Note Series,Note 50,Note 50
+Infinix,Note Series,Note 50,Note 50 Pro
+Infinix,Hot Series,Hot 30,Hot 30
+Infinix,Hot Series,Hot 40,Hot 40
+Infinix,Hot Series,Hot 40,Hot 40 Pro
+Infinix,Hot Series,Hot 50,Hot 50
+Infinix,Hot Series,Hot 50,Hot 50 Pro
+Infinix,Zero Series,Zero 30,Zero 30
+Infinix,Zero Series,Zero 40,Zero 40
+Infinix,Zero Series,Zero Ultra,Zero Ultra
+Infinix,Zero Series,Zero Flip,Zero Flip
+Infinix,Smart Series,Smart 7,Smart 7
+Infinix,Smart Series,Smart 8,Smart 8
+Infinix,Smart Series,Smart 9,Smart 9
+Infinix,GT Series,GT 10,GT 10 Pro
+Infinix,GT Series,GT 20,GT 20 Pro
+Tecno,Camon Series,Camon 19,Camon 19
+Tecno,Camon Series,Camon 20,Camon 20
+Tecno,Camon Series,Camon 20,Camon 20 Pro
+Tecno,Camon Series,Camon 30,Camon 30
+Tecno,Camon Series,Camon 30,Camon 30 Pro
+Tecno,Spark Series,Spark 10,Spark 10
+Tecno,Spark Series,Spark 10,Spark 10 Pro
+Tecno,Spark Series,Spark 20,Spark 20
+Tecno,Spark Series,Spark 20,Spark 20 Pro
+Tecno,Spark Series,Spark 30,Spark 30
+Tecno,Spark Series,Spark Go,Spark Go
+Tecno,Pova Series,Pova 5,Pova 5
+Tecno,Pova Series,Pova 6,Pova 6
+Tecno,Pova Series,Pova 6,Pova 6 Pro
+Tecno,Pova Series,Pova Neo,Pova Neo
+Tecno,Phantom Series,Phantom X2,Phantom X2
+Tecno,Phantom Series,Phantom X2,Phantom X2 Pro
+Tecno,Phantom Series,Phantom V Fold,Phantom V Fold
+Tecno,Phantom Series,Phantom V Flip,Phantom V Flip
+Itel,A Series,A26,A26
+Itel,A Series,A50,A50
+Itel,A Series,A60,A60
+Itel,A Series,A70,A70
+Itel,S Series,S23,S23
+Itel,S Series,S24,S24
+Itel,P Series,P40,P40
+Itel,P Series,P55,P55
+Itel,P Series,P55,P55+
+Asus,ROG Phone Series,ROG 6,ROG 6
+Asus,ROG Phone Series,ROG 7,ROG 7
+Asus,ROG Phone Series,ROG 8,ROG 8
+Asus,ROG Phone Series,ROG 8,ROG 8 Pro
+Asus,ROG Phone Series,ROG 9,ROG 9
+Asus,ROG Phone Series,ROG 9,ROG 9 Pro
+Asus,Zenfone Series,Zenfone 9,Zenfone 9
+Asus,Zenfone Series,Zenfone 10,Zenfone 10
+Asus,Zenfone Series,Zenfone 11,Zenfone 11 Ultra
+Sony,Xperia 1 Series,Xperia 1 IV,Xperia 1 IV
+Sony,Xperia 1 Series,Xperia 1 V,Xperia 1 V
+Sony,Xperia 1 Series,Xperia 1 VI,Xperia 1 VI
+Sony,Xperia 1 Series,Xperia 1 VII,Xperia 1 VII
+Sony,Xperia 5 Series,Xperia 5 IV,Xperia 5 IV
+Sony,Xperia 5 Series,Xperia 5 V,Xperia 5 V
+Sony,Xperia 10 Series,Xperia 10 V,Xperia 10 V
+Sony,Xperia 10 Series,Xperia 10 VI,Xperia 10 VI
+Nokia,G Series,G10,G10
+Nokia,G Series,G20,G20
+Nokia,G Series,G21,G21
+Nokia,G Series,G42,G42
+Nokia,G Series,G50,G50
+Nokia,C Series,C12,C12
+Nokia,C Series,C22,C22
+Nokia,C Series,C32,C32
+Nokia,X Series,X10,X10
+Nokia,X Series,X20,X20
+Nokia,X Series,X30,X30
+Lava,Agni Series,Agni 2,Agni 2
+Lava,Agni Series,Agni 3,Agni 3
+Lava,Blaze Series,Blaze 2,Blaze 2
+Lava,Blaze Series,Blaze Curve,Blaze Curve
+Lava,Yuva Series,Yuva 2,Yuva 2
+Lava,Yuva Series,Yuva 3,Yuva 3
+Lava,Yuva Series,Yuva 5G,Yuva 5G
+Micromax,In Series,In 2b,In 2b
+Micromax,In Series,In 2c,In 2c
+Micromax,In Series,In Note 2,In Note 2
+Colors,Pride Series,Pride 1,Pride 1
+Colors,Krazy Series,Krazy 1,Krazy 1

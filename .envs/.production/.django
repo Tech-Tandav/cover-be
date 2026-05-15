@@ -1,0 +1,47 @@
+# General
+# ------------------------------------------------------------------------------
+# DJANGO_READ_DOT_ENV_FILE=True
+DJANGO_SETTINGS_MODULE=config.settings.production
+DJANGO_SECRET_KEY=4MN42NpZEmq6m18GheKf3UVRvdc982oPDBXkp71Cuv04d9L7aKTwqoW9xDKdXV1e
+DJANGO_ADMIN_URL=super-admin
+DJANGO_ALLOWED_HOSTS=.cover.bibekrajparajuli.com.np,localhost,192.168.1.253
+CSRF_TRUSTED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://192.168.1.253:7001,http://localhost
+CORS_ALLOWED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://192.168.1.253:7001,http://localhost
+
+# Security
+# ------------------------------------------------------------------------------
+# TIP: better off using DNS, however, redirect is OK too
+DJANGO_SECURE_SSL_REDIRECT=False
+
+# Email
+# ------------------------------------------------------------------------------
+DJANGO_SERVER_EMAIL=
+
+
+# django-allauth
+# ------------------------------------------------------------------------------
+DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
+
+# Gunicorn
+# ------------------------------------------------------------------------------
+WEB_CONCURRENCY=4
+
+
+# Redis
+# ------------------------------------------------------------------------------
+REDIS_URL=redis://redis:6379/0
+
+# Celery
+# ------------------------------------------------------------------------------
+
+# Flower
+CELERY_FLOWER_USER=nWxjJSqducVzbdguIQtOXgMYBJpTtVAQ
+CELERY_FLOWER_PASSWORD=6eL6sgv4J4hAubOUPbovnsFC52b1ocbI0YTDbHpHUMS1R514EblxFTZ5CWKCELK7
+
+
+# Superuser
+USERNAME=d2
+PASSWORD=dtwo@123
+
+
+DJANGO_SEED_ON_START=True

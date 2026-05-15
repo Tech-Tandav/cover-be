@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+
+python manage.py migrate
+
+# Seed reference data when DJANGO_SEED_ON_START is truthy (true/1/yes).
+# Seed commands are idempotent — safe to re-run on every container start.
+case "${DJANGO_SEED_ON_START:-}" in
+    true|True|TRUE|1|yes|Yes|YES)
+        echo "DJANGO_SEED_ON_START is set — running seed commands…"
+        python manage.py seed_phones
+        python manage.py seed_covers
+        ;;
+esac
+
+exec uvicorn config.asgi:application --host 0.0.0.0 --reload --reload-include '*.html'

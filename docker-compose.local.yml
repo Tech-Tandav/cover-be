@@ -1,0 +1,69 @@
+volumes:
+  cover_house_local_postgres_data: {}
+  cover_house_local_postgres_data_backups: {}
+  cover_house_local_redis_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: cover_house_local_django
+    container_name: cover_house_local_django
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - '8000:8000'
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: cover_house_production_postgres
+    container_name: cover_house_local_postgres
+    volumes:
+      - cover_house_local_postgres_data:/var/lib/postgresql/data
+      - cover_house_local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+
+  redis:
+    image: docker.io/redis:6
+    container_name: cover_house_local_redis
+    volumes:
+      - cover_house_local_redis_data:/data
+
+  celeryworker:
+    <<: *django
+    image: cover_house_local_celeryworker
+    container_name: cover_house_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: cover_house_local_celerybeat
+    container_name: cover_house_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: cover_house_local_flower
+    container_name: cover_house_local_flower
+    ports:
+      - '5555:5555'
+    command: /start-flower

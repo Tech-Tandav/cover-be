@@ -41,6 +41,8 @@ services:
       - ./.envs/.production/.postgres
     networks:
       - cover_house
+    ports:
+      - 5433:5432
     restart: always
 
   redis:
@@ -87,7 +89,7 @@ services:
     volumes:
       - production_django_media:/app/media
     ports:
-      - 127.0.0.1:7001:80
+      - 9827:80
     networks:
       - cover_house
     restart: always

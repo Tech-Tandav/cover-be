@@ -41,8 +41,8 @@ services:
       - ./.envs/.production/.postgres
     networks:
       - cover_house
-    ports:
-      - 5433:5432
+    # ports:
+    #   - 5433:5432
     restart: always
 
   redis:

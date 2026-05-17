@@ -5,6 +5,38 @@ from cover_house.core.models import BaseModel, BaseModelWithSlug
 from cover_house.phones.models import PhoneVariant
 
 
+class SiteSettings(BaseModel):
+    """
+    Singleton row holding global storefront branding. Use
+    `SiteSettings.load()` to fetch (creates the row on first call).
+    """
+    site_name = models.CharField(
+        max_length=100, default="CoverHouse by E-Store"
+    )
+    tagline = models.CharField(max_length=160, blank=True, default="")
+    logo = models.ImageField(upload_to="site/", blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("Site settings")
+        verbose_name_plural = _("Site settings")
+
+    def __str__(self):
+        return self.site_name
+
+    @classmethod
+    def load(cls):
+        obj = cls.objects.first()
+        if obj is None:
+            obj = cls.objects.create()
+        return obj
+
+    def save(self, *args, **kwargs):
+        # Enforce singleton: prevent creating a second row.
+        if not self.pk and SiteSettings.objects.exists():
+            raise ValueError("SiteSettings is a singleton; one row already exists.")
+        super().save(*args, **kwargs)
+
+
 class CaseCategory(BaseModelWithSlug):
     """
     Type of case (Silicone, Clear, Wallet, Rugged, Flip, MagSafe, etc.).
@@ -41,20 +73,20 @@ class CaseColor(BaseModelWithSlug):
 
 class CoverSku(BaseModelWithSlug):
     """
-    Sellable cover product. One row per (design, phone variant, colour) combo.
-    Carts and order lines reference this; stock is tracked here.
+    Sellable cover for a single phone variant. The cover may carry multiple
+    case categories (silicone, clear…) and colours; the customer picks one of
+    each at add-to-cart time. Stock is shared across all such combos.
     """
-    title = models.CharField(_("Title"), max_length=200)
-    category = models.ForeignKey(
-        CaseCategory, on_delete=models.PROTECT, related_name="skus"
+    phone_variant = models.OneToOneField(
+        PhoneVariant, on_delete=models.PROTECT, related_name="cover"
     )
-    phone_variant = models.ForeignKey(
-        PhoneVariant, on_delete=models.PROTECT, related_name="skus"
+    categories = models.ManyToManyField(
+        CaseCategory,
+        blank=True,
+        related_name="skus",
     )
-    color = models.ForeignKey(
+    colors = models.ManyToManyField(
         CaseColor,
-        on_delete=models.PROTECT,
-        null=True,
         blank=True,
         related_name="skus",
     )
@@ -79,22 +111,17 @@ class CoverSku(BaseModelWithSlug):
         ordering = ["-created_at"]
         verbose_name = _("Cover SKU")
         verbose_name_plural = _("Cover SKUs")
-        constraints = [
-            models.UniqueConstraint(
-                fields=["title", "phone_variant", "color"],
-                name="unique_cover_variant_color",
-            ),
-        ]
         indexes = [
-            models.Index(fields=["phone_variant"]),
             models.Index(fields=["sku_code"]),
         ]
 
     def __str__(self):
-        bits = [self.title, str(self.phone_variant)]
-        if self.color_id:
-            bits.append(self.color.name)
-        return " • ".join(bits)
+        return f"Cover for {self.phone_variant}"
+
+    @property
+    def display_name(self):
+        """Customer-facing name. We display the phone variant string."""
+        return str(self.phone_variant)
 
     @property
     def in_stock(self):
@@ -127,4 +154,4 @@ class CoverImage(BaseModel):
         ]
 
     def __str__(self):
-        return f"Image for {self.cover_sku.title}"
+        return f"Image for {self.cover_sku.display_name}"

@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
-from cover_house.cases.models import CoverSku
+from cover_house.cases.models import CaseCategory, CaseColor, CoverSku
 from cover_house.orders.models import (
     Address,
     Cart,
@@ -32,13 +32,20 @@ class AddressSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     cover_sku_id = serializers.UUIDField(source="cover_sku.id", read_only=True)
     sku_code = serializers.CharField(source="cover_sku.sku_code", read_only=True)
-    cover_title = serializers.CharField(source="cover_sku.title", read_only=True)
+    cover_title = serializers.CharField(
+        source="cover_sku.phone_variant", read_only=True
+    )
     cover_slug = serializers.CharField(source="cover_sku.slug", read_only=True)
     phone_variant_name = serializers.CharField(
         source="cover_sku.phone_variant.name", read_only=True
     )
+    category_id = serializers.UUIDField(source="category.id", read_only=True)
+    category_name = serializers.CharField(
+        source="category.name", read_only=True, default=""
+    )
+    color_id = serializers.UUIDField(source="color.id", read_only=True)
     color_name = serializers.CharField(
-        source="cover_sku.color.name", read_only=True, default=""
+        source="color.name", read_only=True, default=""
     )
     unit_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
@@ -55,7 +62,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = [
             "id", "cover_sku_id", "sku_code",
             "cover_title", "cover_slug",
-            "phone_variant_name", "color_name",
+            "phone_variant_name",
+            "category_id", "category_name",
+            "color_id", "color_name",
             "quantity", "unit_price", "line_total",
             "available_stock",
         ]
@@ -81,12 +90,16 @@ class CartSerializer(serializers.ModelSerializer):
 class CartItemWriteSerializer(serializers.Serializer):
     """Used by POST /api/cart/items/ and PATCH /api/cart/items/{id}/."""
     cover_sku = serializers.UUIDField()
+    category = serializers.UUIDField(required=False, allow_null=True)
+    color = serializers.UUIDField(required=False, allow_null=True)
     quantity = serializers.IntegerField(min_value=1, default=1)
 
     def validate(self, attrs):
         try:
-            sku = CoverSku.objects.get(
-                id=attrs["cover_sku"], is_active=True, is_archived=False
+            sku = (
+                CoverSku.objects
+                .prefetch_related("categories", "colors")
+                .get(id=attrs["cover_sku"], is_active=True, is_archived=False)
             )
         except CoverSku.DoesNotExist as exc:
             raise serializers.ValidationError(
@@ -96,6 +109,39 @@ class CartItemWriteSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"quantity": f"Only {sku.stock_qty} in stock."}
             )
+
+        available_categories = list(sku.categories.all())
+        if available_categories:
+            cat_id = attrs.get("category")
+            if not cat_id:
+                raise serializers.ValidationError(
+                    {"category": "Choose a category for this cover."}
+                )
+            cat = next((c for c in available_categories if str(c.id) == str(cat_id)), None)
+            if cat is None:
+                raise serializers.ValidationError(
+                    {"category": "Selected category is not offered for this cover."}
+                )
+            attrs["category_obj"] = cat
+        else:
+            attrs["category_obj"] = None
+
+        available_colors = list(sku.colors.all())
+        if available_colors:
+            color_id = attrs.get("color")
+            if not color_id:
+                raise serializers.ValidationError(
+                    {"color": "Choose a colour for this cover."}
+                )
+            col = next((c for c in available_colors if str(c.id) == str(color_id)), None)
+            if col is None:
+                raise serializers.ValidationError(
+                    {"color": "Selected colour is not offered for this cover."}
+                )
+            attrs["color_obj"] = col
+        else:
+            attrs["color_obj"] = None
+
         attrs["sku_obj"] = sku
         return attrs
 
@@ -107,7 +153,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = [
             "id", "sku_code", "cover_title",
-            "phone_variant_name", "color_name",
+            "phone_variant_name", "category_name", "color_name",
             "unit_price", "quantity", "line_total",
         ]
         read_only_fields = fields
@@ -197,7 +243,9 @@ class CheckoutSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = self.context["request"].user
         try:
-            cart = Cart.objects.prefetch_related("items__cover_sku").get(user=user)
+            cart = Cart.objects.prefetch_related(
+                "items__cover_sku", "items__category", "items__color"
+            ).get(user=user)
         except Cart.DoesNotExist as exc:
             raise serializers.ValidationError("No active cart.") from exc
         if not cart.items.exists():
@@ -214,8 +262,9 @@ class CheckoutSerializer(serializers.Serializer):
         sku_ids = [item.cover_sku_id for item in cart.items.all()]
         skus = {
             s.id: s
-            for s in CoverSku.objects.select_for_update()
-            .select_related("phone_variant", "color")
+            for s in CoverSku.objects.select_related("phone_variant")
+            .prefetch_related("colors")
+            .select_for_update(of=("self",))
             .filter(id__in=sku_ids)
         }
 
@@ -235,7 +284,9 @@ class CheckoutSerializer(serializers.Serializer):
             unit_price = sku.effective_price
             line_total = unit_price * item.quantity
             subtotal += line_total
-            items_payload.append((sku, item.quantity, unit_price, line_total))
+            items_payload.append(
+                (sku, item.category, item.color, item.quantity, unit_price, line_total)
+            )
 
         shipping_fee = validated_data.get("shipping_fee") or Decimal("0.00")
         grand_total = subtotal + shipping_fee
@@ -250,14 +301,15 @@ class CheckoutSerializer(serializers.Serializer):
             **validated_data["ship_fields"],
         )
 
-        for sku, qty, unit_price, line_total in items_payload:
+        for sku, category, color, qty, unit_price, line_total in items_payload:
             OrderItem.objects.create(
                 order=order,
                 cover_sku=sku,
                 sku_code=sku.sku_code,
-                cover_title=sku.title,
+                cover_title=str(sku.phone_variant),
                 phone_variant_name=str(sku.phone_variant),
-                color_name=sku.color.name if sku.color_id else "",
+                category_name=category.name if category else "",
+                color_name=color.name if color else "",
                 unit_price=unit_price,
                 quantity=qty,
                 line_total=line_total,

@@ -89,9 +89,15 @@ class CartItemViewSet(
         ser.is_valid(raise_exception=True)
         sku = ser.validated_data["sku_obj"]
         qty = ser.validated_data["quantity"]
+        category = ser.validated_data.get("category_obj")
+        color = ser.validated_data.get("color_obj")
 
         item, created = CartItem.objects.get_or_create(
-            cart=cart, cover_sku=sku, defaults={"quantity": qty}
+            cart=cart,
+            cover_sku=sku,
+            category=category,
+            color=color,
+            defaults={"quantity": qty},
         )
         if not created:
             new_qty = item.quantity + qty

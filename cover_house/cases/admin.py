@@ -5,7 +5,19 @@ from .models import (
     CaseColor,
     CoverImage,
     CoverSku,
+    SiteSettings,
 )
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    list_display = ("site_name", "tagline", "updated_at")
+
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class CoverImageInline(admin.TabularInline):
@@ -33,33 +45,39 @@ class CaseColorAdmin(admin.ModelAdmin):
 @admin.register(CoverSku)
 class CoverSkuAdmin(admin.ModelAdmin):
     list_display = (
-        "title",
-        "sku_code",
         "phone_variant",
-        "color",
-        "category",
+        "sku_code",
+        "categories_display",
+        "colors_display",
         "base_price",
         "discount_price",
         "stock_qty",
         "is_active",
     )
     list_filter = (
-        "category",
+        "categories",
         "phone_variant__phone_model__series__brand",
-        "color",
+        "colors",
         "is_active",
         "is_archived",
     )
     search_fields = (
-        "title",
         "sku_code",
         "description",
         "phone_variant__name",
         "phone_variant__phone_model__name",
     )
-    autocomplete_fields = ("category", "phone_variant", "color")
-    prepopulated_fields = {"slug": ("title",)}
+    autocomplete_fields = ("phone_variant",)
+    filter_horizontal = ("categories", "colors")
     inlines = [CoverImageInline]
+
+    @admin.display(description="Categories")
+    def categories_display(self, obj):
+        return ", ".join(c.name for c in obj.categories.all()) or "—"
+
+    @admin.display(description="Colors")
+    def colors_display(self, obj):
+        return ", ".join(c.name for c in obj.colors.all()) or "—"
 
 
 @admin.register(CoverImage)

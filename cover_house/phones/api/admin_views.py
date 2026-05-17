@@ -57,12 +57,26 @@ class SeriesAdminViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     lookup_field = "slug"
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        brand = self.request.query_params.get("brand")
+        if brand:
+            qs = qs.filter(brand__slug=brand)
+        return qs
+
 
 class PhoneModelAdminViewSet(viewsets.ModelViewSet):
     queryset = PhoneModel.objects.select_related("series__brand").all()
     serializer_class = PhoneModelAdminSerializer
     permission_classes = [IsAdminUser]
     lookup_field = "slug"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        series = self.request.query_params.get("series")
+        if series:
+            qs = qs.filter(series__slug=series)
+        return qs
 
 
 class PhoneVariantAdminViewSet(viewsets.ModelViewSet):
@@ -72,3 +86,10 @@ class PhoneVariantAdminViewSet(viewsets.ModelViewSet):
     serializer_class = PhoneVariantAdminSerializer
     permission_classes = [IsAdminUser]
     lookup_field = "slug"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        phone_model = self.request.query_params.get("phone_model")
+        if phone_model:
+            qs = qs.filter(phone_model__slug=phone_model)
+        return qs

@@ -124,8 +124,7 @@ class PhoneVariantViewSet(viewsets.ReadOnlyModelViewSet):
                 is_active=True,
                 is_archived=False,
             )
-            .select_related("category", "color")
-            .prefetch_related("images")
+            .prefetch_related("images", "colors", "categories")
         )
         return Response(
             CoverSkuListSerializer(qs, many=True, context={"request": request}).data

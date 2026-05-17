@@ -8,6 +8,7 @@ from cover_house.cases.api.views import (
     CaseCategoryViewSet,
     CaseColorViewSet,
     CoverSkuViewSet,
+    SiteSettingsView,
 )
 from cover_house.phones.api.views import (
     BrandViewSet,
@@ -31,6 +32,7 @@ from cover_house.cases.api.admin_views import (
     CaseColorAdminViewSet,
     CoverImageAdminViewSet,
     CoverSkuAdminViewSet,
+    SiteSettingsAdminView,
 )
 from cover_house.orders.api.admin_views import OrderAdminViewSet
 from cover_house.phones.api.admin_views import (
@@ -102,7 +104,15 @@ urlpatterns = [
     path("cart/", CartView.as_view(), name="cart"),
     path("checkout/", CheckoutView.as_view(), name="checkout"),
 
+    # Storefront branding (public)
+    path("site-settings/", SiteSettingsView.as_view(), name="site-settings"),
+
     # Admin namespace
     path("admin/", include((admin_router.urls, "admin-api"), namespace="admin")),
+    path(
+        "admin/site-settings/",
+        SiteSettingsAdminView.as_view(),
+        name="admin-site-settings",
+    ),
 ]
 urlpatterns += router.urls

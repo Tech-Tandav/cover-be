@@ -5,7 +5,15 @@ from cover_house.cases.models import (
     CaseColor,
     CoverImage,
     CoverSku,
+    SiteSettings,
 )
+
+
+class SiteSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteSettings
+        fields = ["site_name", "tagline", "logo"]
+        read_only_fields = fields
 
 
 class CaseCategorySerializer(serializers.ModelSerializer):
@@ -28,15 +36,12 @@ class CoverImageSerializer(serializers.ModelSerializer):
 
 class CoverSkuListSerializer(serializers.ModelSerializer):
     """Lean payload for grids/listings."""
-    category = serializers.SlugRelatedField(slug_field="slug", read_only=True)
-    category_name = serializers.CharField(source="category.name", read_only=True)
     phone_variant = serializers.SlugRelatedField(slug_field="slug", read_only=True)
     phone_variant_name = serializers.CharField(
         source="phone_variant.name", read_only=True
     )
-    color = serializers.SlugRelatedField(slug_field="slug", read_only=True)
-    color_name = serializers.CharField(source="color.name", read_only=True)
-    color_hex = serializers.CharField(source="color.hex_code", read_only=True)
+    categories = CaseCategorySerializer(many=True, read_only=True)
+    colors = CaseColorSerializer(many=True, read_only=True)
     primary_image = serializers.SerializerMethodField()
     effective_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
@@ -47,10 +52,10 @@ class CoverSkuListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CoverSku
         fields = [
-            "id", "title", "slug", "sku_code",
-            "category", "category_name",
+            "id", "slug", "sku_code",
+            "categories",
             "phone_variant", "phone_variant_name",
-            "color", "color_name", "color_hex",
+            "colors",
             "base_price", "discount_price", "effective_price", "is_on_sale",
             "stock_qty", "in_stock",
             "primary_image",
@@ -73,8 +78,8 @@ class CoverSkuListSerializer(serializers.ModelSerializer):
 
 class CoverSkuDetailSerializer(serializers.ModelSerializer):
     """Full product page payload."""
-    category = CaseCategorySerializer(read_only=True)
-    color = CaseColorSerializer(read_only=True)
+    categories = CaseCategorySerializer(many=True, read_only=True)
+    colors = CaseColorSerializer(many=True, read_only=True)
     phone_variant = serializers.SerializerMethodField()
     images = CoverImageSerializer(many=True, read_only=True)
     effective_price = serializers.DecimalField(
@@ -86,9 +91,9 @@ class CoverSkuDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CoverSku
         fields = [
-            "id", "title", "slug", "sku_code",
+            "id", "slug", "sku_code",
             "description",
-            "category", "color", "phone_variant",
+            "categories", "colors", "phone_variant",
             "base_price", "discount_price", "effective_price", "is_on_sale",
             "stock_qty", "in_stock", "fitment_notes",
             "is_active",

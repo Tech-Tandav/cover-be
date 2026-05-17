@@ -101,6 +101,20 @@ class CartItem(BaseModel):
     cover_sku = models.ForeignKey(
         CoverSku, on_delete=models.CASCADE, related_name="cart_items"
     )
+    category = models.ForeignKey(
+        "cases.CaseCategory",
+        on_delete=models.PROTECT,
+        related_name="+",
+        null=True,
+        blank=True,
+    )
+    color = models.ForeignKey(
+        "cases.CaseColor",
+        on_delete=models.PROTECT,
+        related_name="+",
+        null=True,
+        blank=True,
+    )
     quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
@@ -108,7 +122,8 @@ class CartItem(BaseModel):
         verbose_name_plural = _("Cart Items")
         constraints = [
             models.UniqueConstraint(
-                fields=["cart", "cover_sku"], name="unique_sku_per_cart"
+                fields=["cart", "cover_sku", "category", "color"],
+                name="unique_combo_per_cart",
             ),
         ]
 
@@ -226,6 +241,7 @@ class OrderItem(BaseModel):
     sku_code = models.CharField(max_length=50)
     cover_title = models.CharField(max_length=200)
     phone_variant_name = models.CharField(max_length=120)
+    category_name = models.CharField(max_length=50, blank=True)
     color_name = models.CharField(max_length=50, blank=True)
 
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)

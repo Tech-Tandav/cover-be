@@ -5,8 +5,8 @@ DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_SECRET_KEY=4MN42NpZEmq6m18GheKf3UVRvdc982oPDBXkp71Cuv04d9L7aKTwqoW9xDKdXV1e
 DJANGO_ADMIN_URL=super-admin
 DJANGO_ALLOWED_HOSTS=.cover.bibekrajparajuli.com.np,localhost,202.79.51.253
-CSRF_TRUSTED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://202.79.51.253:8002,http://202.79.51.253:8001
-CORS_ALLOWED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://202.79.51.253:8002,http://202.79.51.253:8001
+CSRF_TRUSTED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://202.79.51.253:9002,http://202.79.51.253:9001
+CORS_ALLOWED_ORIGINS=https://cover.bibekrajparajuli.com.np,https://cover.bibekrajparajuli.com.np,http://202.79.51.253:9002,http://202.79.51.253:9001
 
 # Security
 # ------------------------------------------------------------------------------

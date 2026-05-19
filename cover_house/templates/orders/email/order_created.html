@@ -1,0 +1,64 @@
+{% load humanize %}<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Order confirmation</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f5f5f7; margin:0; padding:24px;">
+  <div style="max-width:560px; margin:0 auto; background:#ffffff; border-radius:12px; padding:28px; color:#1c1c1e;">
+    <h1 style="margin:0 0 8px; font-size:20px;">Thanks for your order!</h1>
+    <p style="margin:0 0 20px; color:#48484a;">
+      Hi {{ order.ship_full_name }}, your order has been received and is being processed.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width:100%; font-size:14px; color:#1c1c1e; margin-bottom:20px;">
+      <tr>
+        <td style="color:#8e8e93;">Order</td>
+        <td style="text-align:right;"><strong>{{ order.order_number }}</strong></td>
+      </tr>
+      <tr>
+        <td style="color:#8e8e93;">Placed</td>
+        <td style="text-align:right;">{{ order.placed_at|date:"d M Y, H:i" }}</td>
+      </tr>
+      <tr>
+        <td style="color:#8e8e93;">Payment</td>
+        <td style="text-align:right;">{{ order.get_payment_method_display }} · {{ order.get_payment_status_display }}</td>
+      </tr>
+    </table>
+
+    <h3 style="margin:0 0 8px; font-size:14px; text-transform:uppercase; color:#8e8e93; letter-spacing:0.04em;">Items</h3>
+    <table cellpadding="0" cellspacing="0" style="width:100%; font-size:14px; border-collapse:collapse;">
+      {% for item in items %}
+      <tr>
+        <td style="padding:10px 0; border-bottom:1px solid #f0f0f3;">
+          {{ item.quantity }} × {{ item.cover_title }}
+          {% if item.phone_variant_name %}<div style="color:#8e8e93; font-size:12px;">{{ item.phone_variant_name }}{% if item.category_name %} · {{ item.category_name }}{% endif %}{% if item.color_name %} · {{ item.color_name }}{% endif %}</div>{% endif %}
+        </td>
+        <td style="padding:10px 0; border-bottom:1px solid #f0f0f3; text-align:right; white-space:nowrap;">
+          NPR {{ item.line_total }}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <table cellpadding="0" cellspacing="0" style="width:100%; font-size:14px; margin-top:14px;">
+      <tr><td style="color:#48484a;">Subtotal</td><td style="text-align:right;">NPR {{ order.subtotal }}</td></tr>
+      <tr><td style="color:#48484a;">Shipping</td><td style="text-align:right;">NPR {{ order.shipping_fee }}</td></tr>
+      {% if order.discount_total %}<tr><td style="color:#48484a;">Discount</td><td style="text-align:right;">− NPR {{ order.discount_total }}</td></tr>{% endif %}
+      <tr><td style="padding-top:8px; font-weight:600;">Total</td><td style="padding-top:8px; text-align:right; font-weight:600;">NPR {{ order.grand_total }}</td></tr>
+    </table>
+
+    <h3 style="margin:24px 0 8px; font-size:14px; text-transform:uppercase; color:#8e8e93; letter-spacing:0.04em;">Ship to</h3>
+    <p style="margin:0; font-size:14px; line-height:1.5;">
+      {{ order.ship_full_name }}<br>
+      {{ order.ship_street_address }}{% if order.ship_landmark %} ({{ order.ship_landmark }}){% endif %}<br>
+      {{ order.ship_city }}, {{ order.ship_district }}{% if order.ship_province %}, {{ order.ship_province|title }}{% endif %}<br>
+      <span style="color:#8e8e93;">{{ order.ship_phone }}</span>
+    </p>
+
+    <p style="margin:28px 0 0; font-size:12px; color:#8e8e93;">
+      You can track this order from your account dashboard at any time.
+    </p>
+  </div>
+</body>
+</html>

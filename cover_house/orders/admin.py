@@ -49,9 +49,13 @@ class CartAdmin(admin.ModelAdmin):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ("cart", "cover_sku", "quantity")
+    list_display = ("cart", "cover_sku", "sku_code", "quantity")
     search_fields = ("cart__id", "cover_sku__sku_code")
     autocomplete_fields = ("cart", "cover_sku")
+
+    @admin.display(description="SKU code", ordering="cover_sku__sku_code")
+    def sku_code(self, obj):
+        return obj.cover_sku.sku_code
 
 
 @admin.register(Order)

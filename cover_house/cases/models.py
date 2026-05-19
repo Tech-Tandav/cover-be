@@ -73,12 +73,13 @@ class CaseColor(BaseModelWithSlug):
 
 class CoverSku(BaseModelWithSlug):
     """
-    Sellable cover for a single phone variant. The cover may carry multiple
-    case categories (silicone, clear…) and colours; the customer picks one of
-    each at add-to-cart time. Stock is shared across all such combos.
+    Sellable cover for a phone variant. A single variant may have multiple
+    covers (e.g. different designs / SKUs); each cover may carry multiple
+    case categories (silicone, clear…) and colours, and the customer picks
+    one of each at add-to-cart time. Stock is per-cover.
     """
-    phone_variant = models.OneToOneField(
-        PhoneVariant, on_delete=models.PROTECT, related_name="cover"
+    phone_variant = models.ForeignKey(
+        PhoneVariant, on_delete=models.PROTECT, related_name="covers"
     )
     categories = models.ManyToManyField(
         CaseCategory,

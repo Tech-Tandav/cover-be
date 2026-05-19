@@ -35,19 +35,22 @@ class PhoneModelAdminSerializer(serializers.ModelSerializer):
 
 
 class PhoneVariantAdminSerializer(serializers.ModelSerializer):
+    # full_name is denormalised and maintained by signals — return it lean
+    # so dropdowns don't need to walk the nested chain.
     class Meta:
         model = PhoneVariant
         fields = [
-            "id", "name", "slug", "phone_model",
+            "id", "name", "slug", "full_name", "phone_model",
             "release_year", "is_active", "is_archived",
         ]
-        read_only_fields = ["id", "slug"]
+        read_only_fields = ["id", "slug", "full_name"]
 
 
 class BrandAdminViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandAdminSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = None
     lookup_field = "slug"
 
 
@@ -55,6 +58,7 @@ class SeriesAdminViewSet(viewsets.ModelViewSet):
     queryset = Series.objects.select_related("brand").all()
     serializer_class = SeriesAdminSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = None
     lookup_field = "slug"
 
     def get_queryset(self):
@@ -69,6 +73,7 @@ class PhoneModelAdminViewSet(viewsets.ModelViewSet):
     queryset = PhoneModel.objects.select_related("series__brand").all()
     serializer_class = PhoneModelAdminSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = None
     lookup_field = "slug"
 
     def get_queryset(self):
@@ -85,6 +90,7 @@ class PhoneVariantAdminViewSet(viewsets.ModelViewSet):
     ).all()
     serializer_class = PhoneVariantAdminSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = None
     lookup_field = "slug"
 
     def get_queryset(self):

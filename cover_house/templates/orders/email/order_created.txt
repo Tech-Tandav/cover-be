@@ -1,0 +1,29 @@
+Hi {{ order.ship_full_name }},
+
+Thanks for shopping with CoverHouse! We've received your order and it's
+being processed.
+
+Order number: {{ order.order_number }}
+Placed at:    {{ order.placed_at|date:"d M Y, H:i" }}
+Payment:      {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})
+
+Items
+-----
+{% for item in items %}- {{ item.quantity }} × {{ item.cover_title }}{% if item.phone_variant_name %} — {{ item.phone_variant_name }}{% endif %}{% if item.category_name %}, {{ item.category_name }}{% endif %}{% if item.color_name %}, {{ item.color_name }}{% endif %}
+  NPR {{ item.line_total }}
+{% endfor %}
+Subtotal:    NPR {{ order.subtotal }}
+Shipping:    NPR {{ order.shipping_fee }}
+Discount:    NPR {{ order.discount_total }}
+Grand total: NPR {{ order.grand_total }}
+
+Ship to
+-------
+{{ order.ship_full_name }}
+{{ order.ship_street_address }}{% if order.ship_landmark %} ({{ order.ship_landmark }}){% endif %}
+{{ order.ship_city }}, {{ order.ship_district }}{% if order.ship_province %}, {{ order.ship_province|title }}{% endif %}
+Phone: {{ order.ship_phone }}
+
+You can track this order any time from your account dashboard.
+
+— CoverHouse

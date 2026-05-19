@@ -80,6 +80,11 @@ class PhoneVariant(BaseModelWithSlug):
         PhoneModel, on_delete=models.CASCADE, related_name="variants"
     )
     name = models.CharField(_("Variant name"), max_length=100)
+    # Denormalised "Brand > Series > Model > Variant" string, kept in sync
+    # by signals so dropdowns can stay lean (one column, no JOINs / nesting).
+    full_name = models.CharField(
+        _("Full name"), max_length=500, blank=True, default="", editable=False,
+    )
     release_year = models.PositiveSmallIntegerField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
@@ -96,3 +101,9 @@ class PhoneVariant(BaseModelWithSlug):
 
     def __str__(self):
         return f"{self.phone_model.series.brand.name} {self.name}"
+
+    def compute_full_name(self) -> str:
+        model = self.phone_model
+        series = model.series
+        brand = series.brand
+        return f"{brand.name} > {series.name} > {model.name} > {self.name}"

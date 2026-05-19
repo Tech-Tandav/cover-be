@@ -82,7 +82,11 @@ class CoverSkuAdmin(admin.ModelAdmin):
 
 @admin.register(CoverImage)
 class CoverImageAdmin(admin.ModelAdmin):
-    list_display = ("cover_sku", "is_primary", "sort_order")
+    list_display = ("cover_sku", "sku_code", "is_primary", "sort_order")
     list_filter = ("is_primary",)
     search_fields = ("cover_sku__title", "cover_sku__sku_code")
     autocomplete_fields = ("cover_sku",)
+
+    @admin.display(description="SKU code", ordering="cover_sku__sku_code")
+    def sku_code(self, obj):
+        return obj.cover_sku.sku_code

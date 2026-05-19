@@ -89,7 +89,7 @@ services:
     volumes:
       - cover_production_django_media:/app/media
     ports:
-      - 8002:80
+      - 9002:80
     networks:
       - cover_house
     restart: always

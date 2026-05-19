@@ -128,3 +128,10 @@ class CoverImageAdminViewSet(viewsets.ModelViewSet):
     queryset = CoverImage.objects.select_related("cover_sku").all()
     serializer_class = CoverImageAdminSerializer
     permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cover_sku = self.request.query_params.get("cover_sku")
+        if cover_sku:
+            qs = qs.filter(cover_sku=cover_sku)
+        return qs.order_by("sort_order", "created_at")

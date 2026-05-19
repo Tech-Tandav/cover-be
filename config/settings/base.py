@@ -176,6 +176,13 @@ MEDIA_ROOT = str(APPS_DIR / "media")
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = "/media/"
 
+# FILE UPLOADS
+# ------------------------------------------------------------------------------
+# Phone photos routinely exceed Django's 2.5 MB default. Keep this aligned with
+# nginx's client_max_body_size in compose/production/nginx/default.conf.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024  # 25 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024  # 25 MB
+
 # TEMPLATES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
